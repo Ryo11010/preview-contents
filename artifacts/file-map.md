@@ -1,0 +1,73 @@
+# file-map (Latest)
+
+## Tree
+- .gitignore
+- .htaccess
+- AGENTS.md
+- docs/
+  - PreviewContentsSite_Requirements_v1.0.md
+  - PreviewContentsSite_Usage.md
+- errors/
+  - 404.html
+  - 500.html
+- index.html
+- maintenance.html
+- previews.json
+- projects/
+  - .htaccess
+- scripts/
+  - bootstrap.mjs
+  - update-gitignore.mjs
+- artifacts/
+  - _catalog.md
+  - _index.json
+  - _timeline.md
+  - changes.md
+  - file-map.md
+  - spec.md
+  - templates/
+    - DebugOverlayTemplate.v1.js
+  - worksets/
+    - 20251207_190740__bootstrap/...
+    - 20251208_142847__restore/
+      - before/ (empty)
+      - after/ (empty)
+      - diff/ (empty)
+      - turns/ (empty)
+      - contracts/ (empty)
+      - meta/
+        - README.md
+        - links.txt
+        - logbook.md
+        - outcomes.jsonl
+        - plan.md
+        - qa_checklist.md
+        - tags.json
+
+## File Roles
+- .gitignore — ベースの除外設定と artifacts ポリシー、現在の GID を unignore。
+- .htaccess — ルートの HTTPS リダイレクトとエラーページ、ディレクトリリスト無効化。
+- AGENTS.md — エージェント運用契約。
+- docs/PreviewContentsSite_Requirements_v1.0.md — 要件定義書 v1.0。
+- docs/PreviewContentsSite_Usage.md — 利用ガイド（/projects ドラッグ運用の手順）。
+- errors/404.html — 404 カスタムページ。
+- errors/500.html — 500 カスタムページ。
+- index.html — プレビュー一覧（previews.json を読み込む）。
+- maintenance.html — メンテナンス表示ページ。
+- previews.json — 一覧データ（初期は空配列）。
+- projects/.htaccess — /projects 配下の SPA フォールバック設定（1階層/2階層対応）。
+- scripts/bootstrap.mjs — artifacts 初期化スクリプト。
+- scripts/update-gitignore.mjs — 現行 GID を .gitignore で unignore。
+- artifacts/spec.md — 単一仕様書。
+- artifacts/changes.md — 単一の修正記録。
+- artifacts/file-map.md — 本ファイル。
+- artifacts/_timeline.md — Workset/Turn の時系列。
+- artifacts/_catalog.md — 機能/領域別インデックス。
+- artifacts/_index.json — 機械可読インデックス。
+- artifacts/templates/DebugOverlayTemplate.v1.js — デバッグオーバーレイの占位。
+- artifacts/worksets/20251207_190740__bootstrap/... — 旧ワークセット（内容保持）。
+- artifacts/worksets/20251208_142847__restore/meta/* — 本復旧ワークセットのメタ情報。
+
+## Excluded
+- `.git/` 配下は除外。
+- `node_modules/` は巨大なためアップロード対象外（必要に応じて再インストール）。

@@ -1,9 +1,3 @@
-承知しました。
-追加要件（**三つの履歴ファイルへ“追記のみ”で一元管理／初回編集で旧体制から強制マージ**）を反映し、**そのままコピペで使える完全版**の `agents.md` を提示します。
-※ご指示どおり **日本語で回答**し、**明示指示がない限り git の stage/push/pull/merge 等は一切行いません**（本書にも明記・仕組み化）。
-
----
-
 # agents.md — LLMエージェント運用契約（**Artifacts＋単一仕様書＋三つの履歴ファイル**／No‑Plan, No‑Code／会話=1修正／漏れゼロ／日本語徹底／git明示指示主義）
 
 > **要点（TL;DR）**
@@ -43,7 +37,7 @@
 
 ## 2) ディレクトリ（核ファイルのみ抜粋）
 
-```
+```text
 /artifacts/
   spec.md                       # 仕様（単一ファイル・追記）
   changes.md                    # 各修正のアプローチ/ロジック（追記）
@@ -53,7 +47,7 @@
   file-map.md                   # ファイル一覧と役割（省略禁止）
   _timeline.md / _catalog.md / _index.json
   worksets/<GID>/...            # 現行 Workset（必要に応じ参照用）
-  templates/DebugOverlayTemplate.v1.js
+  templates/                    # 各種テンプレートコード例
   _archive/ ...                 # 旧体制の退避先（移行時に使用）
 scripts/
   bootstrap.mjs                 # 必要ファイルの自動生成（存在しなければ作成）
@@ -63,7 +57,8 @@ scripts/
   check-history-append-only.mjs # 追記のみかを検査（差分に削除/書換が無いか）
   derive-index.mjs              # Timeline/Index の更新
   git-guard.mjs                 # 指示が無い git 操作の拒否
-```
+/mockup/                        # UI モックアップコード（参照専用・原則非編集・コードから直接参照しない）
+````
 
 ---
 
@@ -78,7 +73,7 @@ scripts/
 
 **`.gitignore`（生成内容）抜粋**
 
-```
+```gitignore
 # === base ===
 .DS_Store
 node_modules/
@@ -99,10 +94,28 @@ coverage/
 !/artifacts/_catalog.md
 !/artifacts/_index.json
 !/artifacts/templates/
-!/artifacts/templates/DebugOverlayTemplate.v1.js
 # 現行 GID は下記スクリプトで追加：
 # scripts/update-gitignore.mjs --gid <GID>
 ```
+
+### 3.1 初期動作の自動生成の対象（不足があれば必ず作成）
+
+* (A) **CI**: `.github/workflows/artifacts-guard.yml`（§15 の YAML をそのまま使用。無ければ新規作成）
+* (B) **PR テンプレート**: `.github/pull_request_template.md`（§16 のテンプレートをそのまま使用）
+* (C) **Lint/Formatter/型検査**: スタックに応じた設定ファイルを作成（例：ESLint/Prettier、SwiftLint、ktlint、flake8/black、gofmt/staticcheck、rustfmt/clippy）
+* (D) **コミット規約**: `.github/COMMIT_CONVENTION.md` に Conventional Commits の要点を記し、PR チェックで参照
+* (E) **git 操作承認スタブ**: `artifacts/worksets/<GID>/meta/git-approval.json` を生成（下記の雛形）。このファイルが無い限り push は不可（§14/§15）
+
+  ```json
+  {
+    "approvedOps": [],
+    "expiresAt": "YYYY-MM-DDThh:mm:ssZ",
+    "note": "ユーザーの明示指示に基づく git 操作のみ許可"
+  }
+  ```
+* (G) **索引初期化**: `artifacts/_timeline.md` `artifacts/_index.json` `artifacts/_catalog.md` が無ければ空テンプレで作成
+
+> ルール：**上書き禁止（冪等）**。既存の管理ファイルがある場合は**追記・統合**のみを行い、既存記述を消さない。
 
 ---
 
@@ -133,7 +146,7 @@ coverage/
 
   ```json
   {"ts":"2025-12-07T10:22:00Z","caseId":"F-021","ref":{"gid":"...","turn":"T02"},
-   "cause":"競合するタイマー再初期化","prevention":["構造化並行へ統一"],"tags":["race"]}
+   "cause":"競合するタイマー再初期化","prevention":["構造化並行へ統一"],"summary":"...", "tags":["race"]}
   ```
 * **禁止**：既存行の改変/削除。**許可**：**末尾への追記のみ**。
 * フック/CI と `check-history-append-only.mjs` で**追記のみ**を強制（§14, §15）。
@@ -149,6 +162,7 @@ coverage/
 
 * **Plan（相談/承認）**が **yes** になるまで、**/artifacts 以外の変更禁止**（pre‑commit が拒否）。
 * Plan には**失敗/成功事例の参照（各 1 以上）**を**必ず**記載。
+* Plan の選択肢は必ず **(A)(B)(C)** のように項目番号を付ける。
 
 ---
 
@@ -159,17 +173,12 @@ coverage/
 
 ---
 
-## 7) Debug ログ（Overlay 既定／コンソール禁止）
-
-* 開発時は**画面オーバーレイのみ**へ出力、**DevTools `console.*` は禁止**。
-* `templates/DebugOverlayTemplate.v1.js` に準拠（UI/ホットキー/重複初期化防止等）。
-
----
-
 ## 8) file‑map.md（省略禁止・全列挙）
 
 * **禁止**：`...`/`…`/`etc.`/`<snip>`/`省略`。
 * 追加/削除/移動/役割変更は**同ターン内で更新**。CI が網羅 100% を検査。
+* `/mockup` 配下も**全ファイルを列挙**し、役割欄に
+  **「UI モックアップ参照専用（原則非編集・コードから直接参照しない）」** と明示する。
 
 ---
 
@@ -182,12 +191,18 @@ coverage/
 
 ## 10) フルワークフロー（会話＝1修正）
 
-1. **ブートストラップ**：`node scripts/bootstrap.mjs`（不足ファイルを**自動生成**）
+1. **ブートストラップ**：`node scripts/bootstrap.mjs`（不足ファイルを**自動生成**。**管理系（§3.1）** — CI／PR テンプレ／Lint/Formatter/型検査／Commit 規約／`git-approval.json` スタブ など **も無ければ必ず作成**）
+
 2. **初回なら移行**：`node scripts/migrate-append-only-history.mjs`（§11）
+
 3. **GID 切替**：`node scripts/update-gitignore.mjs --gid <GID>`（現行 GID のみ追跡）
+
 4. **Plan（相談/承認）**：成功/失敗参照、A/B/C、承認 yes
+
 5. **実装**：最小パッチ＋全文、`file-map.md` 更新
+
 6. **検証**：Lint/型/ユニット/統合/E2E/セキュリティ/複雑度/循環/重複
+
 7. **評価直後に記録**：
 
    * `history.edits.jsonl` へ追記（要約）
@@ -195,6 +210,22 @@ coverage/
    * 仕様影響あり → `spec.md` 更新
    * 反応に評価あり → success/failure へ追記
    * `derive-index.mjs` で索引更新
+
+8. **不要ファイル/フォルダの削除チェック（プレビュー/本番アップロード前）**
+
+   * プレビュー環境/本番環境にアップロードされるディレクトリやパッケージ（例：`deploy/`・`dist/`・`build/` など）に、以下のような開発専用・ドキュメント専用パスが含まれていないかを確認する：
+
+     * `/docs`
+     * `/artifacts`
+     * `gitgnore`
+     * `agents.md`
+     * `calude.md`
+     * その他、プレビュー/本番環境では明らかに不要なファイル・フォルダ
+       （例：ローカルスクリーンショット、設計メモ、巨大サンプルデータ、CI キャッシュ、カバレッジレポートなど）
+   * 含まれていた場合は、**アップロード対象から即座に削除**する
+     （または `.dockerignore`／デプロイ設定／ビルド設定などで確実に除外するパッチを提案する）。
+   * リポジトリのルートに `gitgnore` や `calude.md` のような明らかに不要なファイルが残っている場合は、Plan 内で削除案（A/B/C）を提示し、承認後の実装として削除パッチを出す。
+   * `agents.md` や `/artifacts` はリポジトリ管理上は必要だが、**プレビュー/本番の実行環境には原則アップロードしない**こと。
 
 ---
 
@@ -297,7 +328,6 @@ coverage/
 !/artifacts/_catalog.md
 !/artifacts/_index.json
 !/artifacts/templates/
-!/artifacts/templates/DebugOverlayTemplate.v1.js
 # GID unignore will be appended by scripts/update-gitignore.mjs
 `);
 console.log('bootstrap done.');
@@ -607,6 +637,7 @@ jobs:
 * [ ] 評価反映：成功/失敗 JSONL へ追記
 * [ ] 仕様影響：`spec.md` を追記/更新
 * [ ] `.gitignore`：現行 GID のみ unignore
+* [ ] プレビュー/本番アップロード対象から、`/docs`・`/artifacts`・`gitgnore`・`agents.md`・`calude.md` などの不要ファイル/フォルダを削除または確実に除外
 
 ---
 
@@ -634,9 +665,34 @@ node scripts/append-history.mjs artifacts/history.edits.jsonl \
 
 ---
 
-### 終わりに
+## 21) `/mockup` ディレクトリの扱い（UI モックアップ参照専用）
 
-* 本 `agents.md` は、**仕様=単一ファイル（spec.md）**、**履歴=三つの単一 JSONL（追記のみ）**、**詳細=changes.md** の構成に統一しました。
-* **初回編集時**に**移行スクリプトで完全マージ**し、その後は**追記のみ**の運用で**二度と履歴を失いません**。
-* 以降も、**毎編集で成功/失敗事例を参照**し、**評価があれば即時追記**することで、**再発防止と最短再現**を仕組みで保証します。
-* **git 操作は必ず明示指示がある回のみ**行います（フック/CIで技術的にもブロック）。
+* `/mockup` はリポジトリ直下に置かれる**UI モックアップコード専用フォルダ**であり、
+  **基本的に編集しない・コードから直接参照しない・必要なときだけ参照する**ための領域とする。
+
+* (A) **参照トリガ**
+
+  * ユーザーが明示的に
+    「`/mockup` を見て」「モックアップを参照して」「mockup 内のコードを参考にして」
+    などと指示した場合にのみ、/mockup 配下のファイル内容を読む。
+  * エージェント側から**自発的に `/mockup` 内コードを探索・参照しない**。
+
+* (B) **編集禁止**
+
+  * ユーザーが明示的に
+    「`/mockup` を修正して」「モックアップ側も書き換えて」
+    と指示した場合を除き、/mockup 配下のファイルを**一切変更しない**。
+  * 提案パッチや PR 差分の対象にも、原則として `/mockup` 配下を含めない。
+
+* (C) **コードからの直接参照禁止**
+
+  * 本番コード／ライブラリ／テストコードから `/mockup` 配下を
+    `import` / `require` / ビルド入力（bundler のエントリ）として使用しない。
+  * `/mockup` はあくまで **人間が UI を検討するためのモックアップ・サンプルコード集** であり、
+    ランタイム挙動やビルド成果物には関与させない。
+
+* (D) **file-map への記載**
+
+  * `file-map.md` では `/mockup` 以下の**全ファイルを省略なく列挙**し、役割欄に
+    **「UI モックアップ参照専用（原則非編集・コードから直接参照しない）」**
+    と明記する。

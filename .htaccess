@@ -1,0 +1,14 @@
+# 強制 HTTPS
+RewriteEngine On
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# カスタムエラーページ
+ErrorDocument 404 /errors/404.html
+ErrorDocument 500 /errors/500.html
+
+# メンテナンス切替（必要時のみコメント解除）
+#RewriteRule ^.*$ /maintenance.html [R=302,L]
+
+# ディレクトリリスト無効化
+Options -Indexes

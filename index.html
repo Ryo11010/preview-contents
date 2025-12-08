@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Preview Contents Site</title>
+  <style>
+    :root { --bg:#0f172a; --panel:#111a31; --text:#e6ebff; --muted:#9aa3bb; --accent:#5eead4; --border:rgba(255,255,255,0.08);}
+    *{box-sizing:border-box;}
+    body{margin:0;min-height:100vh;background:radial-gradient(120% 120% at 10% 20%,rgba(94,234,212,0.12),transparent 40%),radial-gradient(120% 120% at 90% 10%,rgba(124,142,252,0.14),transparent 40%),var(--bg);color:var(--text);font-family:"Noto Sans JP","Segoe UI",system-ui,sans-serif;line-height:1.6;}
+    .page{max-width:1100px;margin:0 auto;padding:44px 18px 64px;}
+    h1{margin:4px 0 8px;font-size:32px;letter-spacing:-0.02em;}
+    .lede{color:var(--muted);margin:0 0 20px;}
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:16px 16px 8px;box-shadow:0 18px 40px rgba(0,0,0,0.35);margin-bottom:16px;}
+    table{width:100%;border-collapse:collapse;}
+    th,td{padding:10px 8px;border-bottom:1px solid var(--border);text-align:left;font-size:14px;}
+    th{color:#fff;}
+    .muted{color:var(--muted);font-size:13px;}
+    .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,0.04);font-size:12px;}
+    a{color:var(--accent);text-decoration:none;}a:hover{text-decoration:underline;}
+    input{width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,0.04);color:var(--text);}
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <p class="pill">認証: Basic</p>
+      <h1>社内プレビューの入口</h1>
+      <p class="lede">Xserver 上で `/projects/{project}/{env}/` に配置したビルド成果物をそのままプレビューできます。Basic認証とHTTPSを前提にシンプルな一覧を表示します。</p>
+    </header>
+
+    <section class="card">
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;">
+        <div style="flex:1 1 260px;">
+          <input id="filter" type="search" placeholder="例: project-key, env, 備考" />
+        </div>
+        <div class="muted" id="status">previews.json を読み込み中...</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>プロジェクト名</th>
+              <th>project-key</th>
+              <th>environment</th>
+              <th>プレビューURL</th>
+              <th>備考</th>
+              <th>更新日</th>
+            </tr>
+          </thead>
+          <tbody id="table-body"><tr><td colspan="6">読み込み中...</td></tr></tbody>
+        </table>
+      </div>
+      <p class="muted" style="margin-top:10px;">一覧に出したいプロジェクトだけを `previews.json` に記載してください。存在しない URL は 404 になります。</p>
+    </section>
+
+    <section class="card">
+      <h3>アップロード手順（最短）</h3>
+      <ul class="muted">
+        <li>`public_html/` に: index.html / .htaccess / previews.json / maintenance.html / errors/404.html / errors/500.html</li>
+        <li>`public_html/projects/` にローカルの `/projects` を丸ごとアップロード（含: projects/.htaccess）。</li>
+        <li>URL: `https://preview-contents.site/projects/{project-key}/{environment}/` または `https://preview-contents.site/projects/{project-key}/`</li>
+      </ul>
+    </section>
+  </main>
+
+  <script>
+    const statusEl = document.getElementById('status');
+    const tableBody = document.getElementById('table-body');
+    const filterInput = document.getElementById('filter');
+
+    const render = (items, keyword='') => {
+      const kw = keyword.toLowerCase();
+      const filtered = items.filter(i => [i.displayName,i.projectKey,i.environment,i.note].join(' ').toLowerCase().includes(kw));
+      if (!filtered.length) {
+        tableBody.innerHTML = '<tr><td colspan="6">該当なし</td></tr>';
+        return;
+      }
+      tableBody.innerHTML = filtered.map(i => `
+        <tr>
+          <td>${i.displayName || '-'}</td>
+          <td><code>${i.projectKey || '-'}</code></td>
+          <td><code>${i.environment || '-'}</code></td>
+          <td><a href="${i.url}" target="_blank" rel="noreferrer">${i.url}</a></td>
+          <td class="muted">${i.note || ''}</td>
+          <td class="muted">${i.updatedAt || ''}</td>
+        </tr>
+      `).join('');
+    };
+
+    fetch('previews.json', {cache:'no-store'})
+      .then(res => res.json())
+      .then(data => {
+        const arr = Array.isArray(data) ? data : [];
+        statusEl.textContent = `previews.json を読み込みました（${arr.length}件）`;
+        render(arr, filterInput.value);
+        filterInput.addEventListener('input', e => render(arr, e.target.value));
+      })
+      .catch(() => {
+        statusEl.textContent = 'previews.json を読み込めませんでした（空リストを表示中）';
+        render([], filterInput.value);
+      });
+  </script>
+</body>
+</html>

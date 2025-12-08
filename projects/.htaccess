@@ -1,0 +1,15 @@
+# projects 配下の汎用設定（per-dir 書式）
+RewriteEngine On
+
+# 既存ファイル/ディレクトリはそのまま返す
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# /{project}/{env}/... を index.html へ
+RewriteRule ^([^/]+)/([^/]+)(/.*)?$ $1/$2/index.html [L]
+# /{project}/... を index.html へ
+RewriteRule ^([^/]+)/?$ $1/index.html [L]
+
+# ディレクトリリスト無効化
+Options -Indexes
