@@ -15,9 +15,61 @@
 - previews.json
 - projects/
   - .htaccess
+  - timetime/
+    - stg/
+      - .htaccess
+      - index.html
+      - assets/
+        - index-BlHb8XY3.js
+  - portfolioSite/
+    - preview/
+      - index.html
+      - index.txt
+      - 404.html
+      - favicon.ico
+      - _next/
+        - static/
+          - 5OklaY7Gky8hLsb06ww6g/
+            - _buildManifest.js
+            - _ssgManifest.js
+          - chunks/
+            - 482-6d89d3a98839e695.js
+            - 69-74f535e43adfe3a2.js
+            - app/_not-found-d42ac88213bbffe9.js
+            - app/layout-8a50cfb8157b57f0.js
+            - app/page-94bca8e93f3a1371.js
+            - fd9d1056-a906af599a1beb90.js
+            - framework-aec844d2ccbe7592.js
+            - main-44e2a2ecb6e1b89c.js
+            - main-app-258e255b495f8e26.js
+            - pages/_app-75f6107b0260711c.js
+            - pages/_error-9a890acb1e81c3fc.js
+            - polyfills-c67a75d1b6f99dc8.js
+            - webpack-c8a1299643c3179e.js
+          - css/
+            - 07bb86708c4cf14b.css
+      - images/
+        - profile/portrait.jpg
+        - projects/README.md
+        - projects/codeclipper/ICON-base_CodeClipper_light.png
+        - projects/codeclipper/README.md
+        - projects/dialect-museum/dialectmuseum-screenshot-01-home.webp
+        - projects/dialect-museum/dialectmuseum-screenshot-02-download.webp
+        - projects/dialect-museum/dialectmuseum-screenshot-03-detail.webp
+        - projects/dialect-museum/dialectmuseum-screenshot-04-learning.webp
+        - projects/dialect-museum/README.md
+        - projects/dialect-museum/screenshot.webp
+        - projects/funteru-site/README.md
+        - projects/mhlab/ICON-base_MHLab_light.png
+        - projects/mhlab/README.md
+        - projects/removision/ICON-base_RemoVision_light.png
+        - projects/removision/README.md
+        - projects/shift-scanner/ICON-base_ShiftScanner_light.png
+        - projects/shift-scanner/README.md
 - scripts/
   - bootstrap.mjs
   - update-gitignore.mjs
+  - generate-previews-json.mjs
 - artifacts/
   - _catalog.md
   - _index.json
@@ -55,9 +107,19 @@
 - index.html — プレビュー一覧（previews.json を読み込む）。
 - maintenance.html — メンテナンス表示ページ。
 - previews.json — 一覧データ（初期は空配列）。
-- projects/.htaccess — /projects 配下の SPA フォールバック設定（1階層/2階層対応）。
+- projects/.htaccess — /projects 配下の SPA フォールバック設定（1階層/2階層対応）＋ドットファイル遮断。
+- projects/timetime/stg/.htaccess — timetime プレビューの SPA フォールバック（base=/projects/timetime/stg/）。
+- projects/timetime/stg/index.html — timetime ビルド済み index。
+- projects/timetime/stg/assets/index-BlHb8XY3.js — timetime ビルド済みバンドル。
+- projects/portfolioSite/preview/index.html — portfolioSite ビルド済み index（basePath=/projects/portfolioSite/preview）。
+- projects/portfolioSite/preview/index.txt — Next export の補助ファイル。
+- projects/portfolioSite/preview/404.html — portfolioSite の静的 404。
+- projects/portfolioSite/preview/favicon.ico — portfolioSite のファビコン。
+- projects/portfolioSite/preview/_next/static/** — portfolioSite のビルド済み JS/CSS。
+- projects/portfolioSite/preview/images/** — portfolioSite の画像アセット（ギャラリーデータ）。
 - scripts/bootstrap.mjs — artifacts 初期化スクリプト。
 - scripts/update-gitignore.mjs — 現行 GID を .gitignore で unignore。
+- scripts/generate-previews-json.mjs — /projects を走査し、ビルド済み project/env の index.html から previews.json を自動生成。
 - artifacts/spec.md — 単一仕様書。
 - artifacts/changes.md — 単一の修正記録。
 - artifacts/file-map.md — 本ファイル。

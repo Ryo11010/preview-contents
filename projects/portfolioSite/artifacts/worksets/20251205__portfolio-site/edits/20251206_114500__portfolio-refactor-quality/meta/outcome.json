@@ -1,0 +1,17 @@
+{
+  "editId": "20251206_114500__portfolio-refactor-quality",
+  "worksetId": "20251205__portfolio-site",
+  "status": "warning",
+  "summary": "Centralized copy/tokens (background layers, folder motion, sheet thresholds), adopted next/image for galleries, and kept UI intact; lint passed but build is blocked offline by Google Fonts fetch.",
+  "testing": {
+    "lint": "pass",
+    "unit": "not_run",
+    "integration": "not_run",
+    "e2e": "not_run",
+    "notes": "npm run build failed (ENOTFOUND fonts.googleapis.com fetching Manrope). Re-run with network or provide a local font fallback."
+  },
+  "hardcode": {
+    "policyFollowed": true,
+    "notes": "All copy/CTA/share strings and UI thresholds moved into config modules; no new environment-dependent literals introduced."
+  }
+}

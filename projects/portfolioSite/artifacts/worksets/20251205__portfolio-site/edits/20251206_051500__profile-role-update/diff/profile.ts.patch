@@ -1,0 +1,16 @@
+diff --git a/site/src/data/profile.ts b/site/src/data/profile.ts
+index 48e908c..9fe7eee 100644
+--- a/site/src/data/profile.ts
++++ b/site/src/data/profile.ts
+@@ -3,7 +3,10 @@ import type { Profile } from './types';
+ 
+ export const profile: Profile = {
+   name: '鶴谷 陵',
+-  role: 'FunterU 代表 / Full-stack Engineer',
++  role: {
++    line1: '合同会社FunterU代表 / 株式会社Clam Ocean エンジニア兼役員',
++    line2: 'Full-stack Engineer'
++  },
+   catchphrase: 'Joy through code.',
+   description:
+     '学生起業家として合同会社FunterUを設立。AI OCR・プライバシー重視の解析・LLMユーティリティ・ゲーム計算アプリまで、モバイルとクラウドを横断した体験づくりに取り組んでいます。',

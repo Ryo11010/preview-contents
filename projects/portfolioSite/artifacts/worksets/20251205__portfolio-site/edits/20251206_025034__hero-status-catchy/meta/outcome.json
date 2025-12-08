@@ -1,0 +1,17 @@
+{
+  "editId": "20251206_025034__hero-status-catchy",
+  "worksetId": "20251205__portfolio-site",
+  "status": "success",
+  "summary": "Updated hero badge and lead to include the name: badge now reads 'Ryo Tsurutani · FunterU' and lead introduces him directly.",
+  "testing": {
+    "lint": "not_run",
+    "unit": "not_run",
+    "integration": "not_run",
+    "e2e": "not_run",
+    "notes": "Manual dev check recommended to ensure the badge/lead render well without awkward wrapping."
+  },
+  "hardcode": {
+    "policyFollowed": true,
+    "notes": "Text stays in tokens; no component-level literals or secrets added."
+  }
+}

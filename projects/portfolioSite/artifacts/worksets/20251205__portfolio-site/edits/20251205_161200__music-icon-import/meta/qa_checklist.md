@@ -1,0 +1,7 @@
+- [x] Workset 確認／Plan 承認（No-Plan, No-Code 遵守）
+- [x] ハードコード観点整理（新規値追加なし、アイコン import 補填のみ）
+- [x] Music アイコン import を追加し、FocusZen の Runtime Error を解消できる状態にした（他データ不変）
+- [x] before/after/diff/meta の 3+1 整備（projects.ts と manifest/diff/plan/evaluation/outcome）
+- [x] file-map.md 更新反映
+- [x] タイムライン／カタログ／インデックス更新
+- [ ] Lint/型/テスト実行（未実施）

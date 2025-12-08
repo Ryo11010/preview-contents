@@ -1,0 +1,41 @@
+{
+  "worksetId": "20251204__ui-hardening",
+  "title": "Portfolio UI Hardening",
+  "edits": [
+    {
+      "id": "20251204_150627__ui-refactor",
+      "status": "completed",
+      "summary": "Refactored single-file React UI with typed data/constants and stable handlers while preserving preview and UX.",
+      "createdAt": "2025-12-04T15:06:27",
+      "completedAt": "2025-12-04T15:45:00"
+    },
+    {
+      "id": "20251204_211221__folder-interaction",
+      "status": "completed",
+      "summary": "Refactored FolderInteraction mockup with typed layouts, motion/config constants, and reusable skeleton blocks while keeping UI/preview unchanged.",
+      "createdAt": "2025-12-04T21:12:21",
+      "completedAt": "2025-12-04T21:40:00"
+    },
+    {
+      "id": "20251204_214311__app-hardening",
+      "status": "completed",
+      "summary": "Reorganized app.tsx into section components with guarded helpers and centralized tokens while maintaining existing UI and canvas preview.",
+      "createdAt": "2025-12-04T21:43:11",
+      "completedAt": "2025-12-04T22:10:00"
+    },
+    {
+      "id": "20251204_230100__app-native-ready",
+      "status": "completed",
+      "summary": "Isolated browser-specific actions behind a platform bridge and tightened observers for RN readiness while keeping the UI/preview unchanged.",
+      "createdAt": "2025-12-04T23:01:00",
+      "completedAt": "2025-12-04T23:30:00"
+    },
+    {
+      "id": "20251205_142847__app-debt-burndown",
+      "status": "completed",
+      "summary": "Hardened app.tsx with typed categories, centralized lookups, guarded browser actions, and stabilized gallery/responsive behavior while keeping the single-file UI and canvas preview unchanged.",
+      "createdAt": "2025-12-05T14:28:47",
+      "completedAt": "2025-12-05T15:00:00"
+    }
+  ]
+}

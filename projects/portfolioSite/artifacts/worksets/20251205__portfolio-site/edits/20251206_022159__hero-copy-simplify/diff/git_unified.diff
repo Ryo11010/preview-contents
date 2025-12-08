@@ -1,0 +1,32 @@
+diff --git a/site/src/config/tokens.ts b/site/src/config/tokens.ts
+index faacd53..5bc6782 100644
+--- a/site/src/config/tokens.ts
++++ b/site/src/config/tokens.ts
+@@ -6,10 +6,10 @@ export const textures = {
+ };
+ 
+ export const heroCopy = {
+-  status: 'FunterU CEO / Engineer',
+-  leadPrefix: '技術で「楽しさ」を届ける',
+-  leadHighlight: '鶴谷 陵のポートフォリオ',
+-  leadSuffix: '',
++  status: 'Ryo Tsurutani / FunterU',
++  leadPrefix: '楽しさを届ける',
++  leadHighlight: 'エンジニア 鶴谷 陵',
++  leadSuffix: 'のポートフォリオ',
+ };
+ 
+ export const shareCopy = {
+diff --git a/site/src/data/profile.ts b/site/src/data/profile.ts
+index f3d1235..97ae12d 100644
+--- a/site/src/data/profile.ts
++++ b/site/src/data/profile.ts
+@@ -4,7 +4,7 @@ import type { Profile } from './types';
+ export const profile: Profile = {
+   name: '鶴谷 陵',
+   role: 'FunterU 代表 / Full-stack Engineer',
+-  catchphrase: '楽しさとあなたを繋ぐ技術で未来を創る',
++  catchphrase: '技術で楽しさを届ける',
+   description:
+     '学生起業家として合同会社FunterUを設立。AI OCR・プライバシー重視の解析・LLMユーティリティ・ゲーム計算アプリまで、モバイルとクラウドを横断した体験づくりに取り組んでいます。',
+   email: 'contact@funteru.co.jp',

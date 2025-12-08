@@ -1,0 +1,17 @@
+{
+  "editId": "20251206_031043__work-section-english",
+  "worksetId": "20251205__portfolio-site",
+  "status": "success",
+  "summary": "Switched the Work section to English-first: updated category labels/sub-labels and the section hint, and added Ryo Tsurutani to the heading.",
+  "testing": {
+    "lint": "not_run",
+    "unit": "not_run",
+    "integration": "not_run",
+    "e2e": "not_run",
+    "notes": "Manual dev preview recommended to check wrapping of category labels and the section heading."
+  },
+  "hardcode": {
+    "policyFollowed": true,
+    "notes": "Text changes only; no secrets or component-level literals beyond data/config updates."
+  }
+}

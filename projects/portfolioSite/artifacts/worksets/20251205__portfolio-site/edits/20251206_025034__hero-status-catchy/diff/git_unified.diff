@@ -1,0 +1,15 @@
+diff --git a/site/src/config/tokens.ts b/site/src/config/tokens.ts
+index 0cfe38d..76a752d 100644
+--- a/site/src/config/tokens.ts
++++ b/site/src/config/tokens.ts
+@@ -6,8 +6,8 @@ export const textures = {
+ };
+ 
+ export const heroCopy = {
+-  status: 'Joy through Code',
+-  leadPrefix: 'I build',
++  status: 'Ryo Tsurutani · FunterU',
++  leadPrefix: "I'm Ryo Tsurutani — I build",
+   leadHighlight: 'joyful products',
+   leadSuffix: ' that connect people.',
+ };

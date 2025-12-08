@@ -1,0 +1,102 @@
+diff --git a/site/src/config/site.ts b/site/src/config/site.ts
+index 8979ee8..e7dcc7a 100644
+--- a/site/src/config/site.ts
++++ b/site/src/config/site.ts
+@@ -1,7 +1,7 @@
+ export const siteMetadata = {
+-  title: 'FunterU | 楽しさとあなたを繋ぐ技術で未来を創る',
++  title: '鶴谷 陵 | FunterU CEO / Full-stack Engineer',
+   description:
+-    '代表鶴谷陵率いる学生エンジニア集団FunterU。ShiftScanner・RemoVision・CodeClipper・MHLabなどのプロダクトと受託実績で、楽しさとあなたを繋ぐ技術ソリューションを提供します。',
++    '学生エンジニアとしてFunterUを創業し、AI×モバイルを軸にShiftScanner・RemoVision・CodeClipper・MHLabをリードする鶴谷 陵のポートフォリオ。',
+   baseUrl: 'https://www.funteru.co.jp',
+   ogImage: 'https://www.funteru.co.jp/assets/og-image.jpg',
+   contactEmail: 'contact@funteru.co.jp',
+diff --git a/site/src/config/tokens.ts b/site/src/config/tokens.ts
+index 6afb66e..faacd53 100644
+--- a/site/src/config/tokens.ts
++++ b/site/src/config/tokens.ts
+@@ -6,9 +6,9 @@ export const textures = {
+ };
+ 
+ export const heroCopy = {
+-  status: '楽しさとあなたを繋ぐ',
+-  leadPrefix: '学生エンジニア集団 FunterU が',
+-  leadHighlight: '技術で未来を創る',
++  status: 'FunterU CEO / Engineer',
++  leadPrefix: '技術で「楽しさ」を届ける',
++  leadHighlight: '鶴谷 陵のポートフォリオ',
+   leadSuffix: '',
+ };
+ 
+diff --git a/site/src/data/profile.ts b/site/src/data/profile.ts
+index 6167cd5..f3d1235 100644
+--- a/site/src/data/profile.ts
++++ b/site/src/data/profile.ts
+@@ -2,11 +2,11 @@ import { Brain, GraduationCap, Palette, ShieldCheck } from 'lucide-react';
+ import type { Profile } from './types';
+ 
+ export const profile: Profile = {
+-  name: '合同会社FunterU',
+-  role: '代表 鶴谷 陵 / 副代表 佐藤 芳樹',
++  name: '鶴谷 陵',
++  role: 'FunterU 代表 / Full-stack Engineer',
+   catchphrase: '楽しさとあなたを繋ぐ技術で未来を創る',
+   description:
+-    '学生エンジニア集団として、AI・モバイル・デザインを横断したプロダクトと受託開発を手掛けています。ShiftScanner、RemoVision、CodeClipper、MHLab などの実サービスを通じて、「楽しさとあなた」を結ぶ体験を届けます。',
++    '学生起業家として合同会社FunterUを設立。AI OCR・プライバシー重視の解析・LLMユーティリティ・ゲーム計算アプリまで、モバイルとクラウドを横断した体験づくりに取り組んでいます。',
+   email: 'contact@funteru.co.jp',
+   socials: { github: 'https://github.com/Tsurutani-Ryo', twitter: 'https://twitter.com/Tsurutani-Ryo' },
+   skills: [
+diff --git a/site/src/data/projects.ts b/site/src/data/projects.ts
+index 045939c..927a36f 100644
+--- a/site/src/data/projects.ts
++++ b/site/src/data/projects.ts
+@@ -17,7 +17,7 @@ export const projects: Project[] = [
+     title: 'ShiftScanner',
+     category: 'app',
+     year: '2025',
+-    role: 'Lead iOS / Backend',
++    role: 'CEO / Lead iOS & Backend',
+     tagline: 'PDF/ExcelをAI解析し、手当込み給与を±1分で試算',
+     description: 'AI(OCR + Gemini)でシフト表を正規化し、給与を即座に見える化するiOSアプリ。',
+     longDescription:
+@@ -100,7 +100,7 @@ export const projects: Project[] = [
+     title: 'FunterU Official Site',
+     category: 'web',
+     year: '2025',
+-    role: 'Design & Dev',
++    role: 'Designer / Developer',
+     tagline: '楽しさとあなたを繋ぐコーポレートサイト',
+     description: '液体ガラス質感で製品・受託・チームを一元紹介する公式サイト。',
+     longDescription:
+@@ -119,7 +119,7 @@ export const projects: Project[] = [
+     title: '日本語ミュージアム',
+     category: 'client',
+     year: '2024',
+-    role: 'Contract Dev',
++    role: 'Contract Developer',
+     tagline: '全国の方言を研究者向けに整理',
+     description: '地図と一括ダウンロードで方言データを扱える教育系Webアプリ。',
+     longDescription:
+diff --git a/site/src/data/timeline.ts b/site/src/data/timeline.ts
+index 5e68c0d..46f7f95 100644
+--- a/site/src/data/timeline.ts
++++ b/site/src/data/timeline.ts
+@@ -1,4 +1,4 @@
+-import { Gamepad2, Library, Scan, Scissors, Sparkles } from 'lucide-react';
++import { Briefcase, Gamepad2, Library, Scan, Scissors } from 'lucide-react';
+ import { projectLookup } from './projects';
+ import type { TimelineItem } from './types';
+ 
+@@ -30,8 +30,8 @@ export const timeline: TimelineItem[] = [
+   {
+     year: '2024',
+     title: '合同会社FunterU 設立',
+-    desc: '学生エンジニア集団として法人化し、公式サイトを公開。',
+-    icon: Sparkles,
++    desc: '学生起業家として法人化し、プロダクトと受託を統合管理。',
++    icon: Briefcase,
+     projectId: 'funteru-site',
+     color: 'text-amber-500',
+   },

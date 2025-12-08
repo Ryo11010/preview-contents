@@ -1,0 +1,17 @@
+{
+  "editId": "20251205_190000__postcss-config-fix",
+  "worksetId": "20251205__portfolio-site",
+  "status": "success",
+  "summary": "Switched PostCSS config to CommonJS (postcss.config.js) so Next picks up Tailwind/Autoprefixer and generates utilities; removed the unused mjs file.",
+  "testing": {
+    "lint": "not_run",
+    "unit": "not_run",
+    "integration": "not_run",
+    "e2e": "not_run",
+    "notes": "Restart dev server to apply; build may fail offline when fetching Google Fonts."
+  },
+  "hardcode": {
+    "policyFollowed": true,
+    "notes": "No new literals added; only configuration format changed."
+  }
+}

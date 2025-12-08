@@ -1,0 +1,184 @@
+diff --git a/artifacts/_catalog.md b/artifacts/_catalog.md
+index 436b0b0..4f584bb 100644
+--- a/artifacts/_catalog.md
++++ b/artifacts/_catalog.md
+@@ -15,3 +15,4 @@
+     - Completed: `20251206_025034__hero-status-catchy` — Updated the hero badge text to a catchier line while keeping layout unchanged.
+     - Completed: `20251206_033641__gitignore-next-ignore` — Added explicit `.next/` ignore rules and removed tracked `site/.next` artifacts from the index to eliminate Git noise.
+     - Completed: `20251206_114500__portfolio-refactor-quality` — Centralized copy/tokens (background/folder motion/sheet thresholds), adopted `next/image` for galleries, lint passed; build blocked offline by Google Fonts fetch.
++    - Completed: `20251207_133935__timeline-month` — Added month metadata to Journey timeline items and display them as YYYY.MM on the pills while keeping UI/UX unchanged.
+diff --git a/artifacts/_index.json b/artifacts/_index.json
+index 91897e7..cd74abe 100644
+--- a/artifacts/_index.json
++++ b/artifacts/_index.json
+@@ -79,6 +79,10 @@
+         {
+           "id": "20251206_114500__portfolio-refactor-quality",
+           "status": "completed"
++        },
++        {
++          "id": "20251207_133935__timeline-month",
++          "status": "completed"
+         }
+       ]
+     }
+diff --git a/artifacts/_timeline.md b/artifacts/_timeline.md
+index 48a1b09..4249eff 100644
+--- a/artifacts/_timeline.md
++++ b/artifacts/_timeline.md
+@@ -19,3 +19,4 @@
+ - 2025-12-06: Edit `20251206_025034__hero-status-catchy` completed — Updated the hero badge text to a catchier line while keeping layout unchanged.
+ - 2025-12-06: Edit `20251206_033641__gitignore-next-ignore` completed — Added explicit `.next/` and `site/.next/` ignore rules and removed tracked `site/.next` artifacts from the index to eliminate Git status noise.
+ - 2025-12-06: Edit `20251206_114500__portfolio-refactor-quality` completed — Centralized copy/tokens, moved gallery media to `next/image`, tokenized folder/sheet metrics, lint passed; build blocked offline by Google Fonts fetch.
++- 2025-12-07: Edit `20251207_133935__timeline-month` completed — Added month metadata to Journey timeline items and display them as YYYY.MM on the pills while keeping UI/UX unchanged.
+diff --git a/artifacts/file-map.md b/artifacts/file-map.md
+index c524b12..2ccab2b 100644
+--- a/artifacts/file-map.md
++++ b/artifacts/file-map.md
+@@ -294,6 +294,23 @@ artifacts/worksets/20251205__portfolio-site/ — 新規ポートフォリオ実
+ - artifacts/worksets/20251205__portfolio-site/edits/20251206_031043__work-section-english/meta/qa_checklist.md — QA チェックリスト。
+ - artifacts/worksets/20251205__portfolio-site/edits/20251206_031043__work-section-english/attachments/ — 添付（空）。
+ - artifacts/worksets/20251205__portfolio-site/edits/20251206_031043__work-section-english/contracts/ — 契約変更（空）。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/meta/plan.md — Journey タイムラインに年月表示を追加する計画（承認済）。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/before/Timeline.tsx — 変更前 Timeline セクション（年のみ表示）。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/before/timeline.ts — 変更前 タイムラインデータ（年のみ）。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/before/types.ts — 変更前 タイムライン型（月フィールドなし）。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/before/manifest_before.json — before SHA-256。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/after/Timeline.tsx — 変更後 Timeline セクション（年月フォーマット表示）。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/after/timeline.ts — 変更後 タイムラインデータ（月情報追加、YYYY.MM 表示用）。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/after/types.ts — 変更後 タイムライン型（月フィールド追加）。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/after/manifest_after.json — after SHA-256。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/diff/git_unified.diff — 差分（Timeline 表示とデータの月追加）。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/diff/lint_and_typecheck.log — `npm run lint` ログ。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/diff/tests.log — テスト実行状況（今回は未実施）。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/meta/evaluation.md — 評価。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/meta/outcome.json — 構造化アウトカム。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/meta/qa_checklist.md — QA チェックリスト。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/attachments/ — 添付（空）。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/contracts/ — 契約変更（空）。
+ 
+ artifacts/success-cases/ — 成功事例置き場。
+ - artifacts/success-cases/20251205_192700__postcss-explicit-config/README.md — Tailwind 未展開を PostCSS 設定明示で解消した成功事例。
+diff --git a/artifacts/worksets/20251205__portfolio-site/WORKSET.md b/artifacts/worksets/20251205__portfolio-site/WORKSET.md
+index 98cb204..12f1648 100644
+--- a/artifacts/worksets/20251205__portfolio-site/WORKSET.md
++++ b/artifacts/worksets/20251205__portfolio-site/WORKSET.md
+@@ -28,3 +28,4 @@
+ - 2025-12-06: Edit `20251206_013025__gitignore-cleanup` 完了 — ルート `.gitignore` を拡充し、Next/Node のビルド成果物・キャッシュ・ログ・OS ファイルを除外して Git ノイズを削減。
+ - 2025-12-06: Edit `20251206_033641__gitignore-next-ignore` 完了 — `.next/` と `site/.next/` を明示的に無視し、既存の `site/.next` 追跡分をインデックスから除外。
+ - 2025-12-06: Edit `20251206_114500__portfolio-refactor-quality` 実施 — セクション文言/コピーを `config/copy.ts` に集約し、背景/フォルダモーション/シート閾値をトークン化、ギャラリーを `next/image` へ移行して lint 通過。ビルドは Google Fonts (Manrope) の取得がオフラインで失敗するため要ネットワーク環境。
++- 2025-12-07: Edit `20251207_133935__timeline-month` 完了 — Timeline（Journey）のピルに年+月（YYYY.MM）を表示するため、月データを追加しフォーマットヘルパーで描画。
+diff --git a/artifacts/worksets/20251205__portfolio-site/_index.json b/artifacts/worksets/20251205__portfolio-site/_index.json
+index 182fe43..395646b 100644
+--- a/artifacts/worksets/20251205__portfolio-site/_index.json
++++ b/artifacts/worksets/20251205__portfolio-site/_index.json
+@@ -51,6 +51,10 @@
+       {
+         "id": "20251206_114500__portfolio-refactor-quality",
+         "status": "completed"
++      },
++      {
++        "id": "20251207_133935__timeline-month",
++        "status": "completed"
+       }
+     ]
+   }
+diff --git a/artifacts/worksets/20251205__portfolio-site/_index.md b/artifacts/worksets/20251205__portfolio-site/_index.md
+index 9c06c9d..2f0b87a 100644
+--- a/artifacts/worksets/20251205__portfolio-site/_index.md
++++ b/artifacts/worksets/20251205__portfolio-site/_index.md
+@@ -12,3 +12,4 @@
+ - 20251206_025034__hero-status-catchy — Status: Completed — Updated the hero badge text to a catchier line while keeping layout unchanged.
+ - 20251206_033641__gitignore-next-ignore — Status: Completed — Added explicit `.next/` and `site/.next/` ignore rules and removed tracked `site/.next` artifacts from the index to stop Git noise.
+ - 20251206_114500__portfolio-refactor-quality — Status: Completed — Centralized copy/tokens (background/folder motion/sheet thresholds), moved gallery to `next/image`, lint passed; build blocked offline by Google Fonts fetch.
++- 20251207_133935__timeline-month — Status: Completed — Added month data to timeline items and display, formatting as YYYY.MM on the Journey pills while keeping UI intact.
+diff --git a/site/src/components/sections/Timeline.tsx b/site/src/components/sections/Timeline.tsx
+index e8abcc1..681103b 100644
+--- a/site/src/components/sections/Timeline.tsx
++++ b/site/src/components/sections/Timeline.tsx
+@@ -6,6 +6,12 @@ import type { TimelineSectionProps } from './types';
+ import { LiquidCard } from '../LiquidCard';
+ import { getTimelineProject } from '@/data/timeline';
+ 
++const formatTimelineDate = (year: string, month?: string) => {
++  if (!month) return year;
++  const normalizedMonth = month.padStart(2, '0');
++  return `${year}.${normalizedMonth}`;
++};
++
+ export const TimelineSection: React.FC<TimelineSectionProps> = ({ items, onSelectProject }) => (
+   <div id="history" className="max-w-4xl mx-auto px-6 py-24">
+     <SectionHeader title={sectionCopy.timeline.title} align="center" />
+@@ -16,6 +22,7 @@ export const TimelineSection: React.FC<TimelineSectionProps> = ({ items, onSelec
+       {items.map((item, index) => {
+         const Icon = item.icon;
+         const project = item.projectId ? getTimelineProject(item.projectId) : null;
++        const dateLabel = formatTimelineDate(item.year, item.month);
+         return (
+           <div key={`${item.title}-${index}`} className="relative pl-28 group">
+             <div className="absolute left-0 top-1/2 -translate-y-1/2 w-20 h-20 flex items-center justify-center">
+@@ -38,7 +45,7 @@ export const TimelineSection: React.FC<TimelineSectionProps> = ({ items, onSelec
+                   {item.title}
+                   {project && <ArrowUpRight size={16} className="text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity" />}
+                 </h3>
+-                <span className="text-xs font-bold text-slate-400 bg-slate-100 px-3 py-1 rounded-full w-fit">{item.year}</span>
++                <span className="text-xs font-bold text-slate-400 bg-slate-100 px-3 py-1 rounded-full w-fit">{dateLabel}</span>
+               </div>
+               <p className="text-slate-600 leading-relaxed">{item.desc}</p>
+             </LiquidCard>
+diff --git a/site/src/data/timeline.ts b/site/src/data/timeline.ts
+index 46f7f95..077949f 100644
+--- a/site/src/data/timeline.ts
++++ b/site/src/data/timeline.ts
+@@ -5,6 +5,7 @@ import type { TimelineItem } from './types';
+ export const timeline: TimelineItem[] = [
+   {
+     year: '2025',
++    month: '03',
+     title: 'ShiftScanner リリース',
+     desc: 'AIシフト解析と給与試算を提供するiOSアプリを公開。',
+     icon: Scan,
+@@ -13,6 +14,7 @@ export const timeline: TimelineItem[] = [
+   },
+   {
+     year: '2025',
++    month: '02',
+     title: 'CodeClipper リリース',
+     desc: 'LLM向けの自動分割コピー機能を備えたmacOSユーティリティを展開。',
+     icon: Scissors,
+@@ -21,6 +23,7 @@ export const timeline: TimelineItem[] = [
+   },
+   {
+     year: '2025',
++    month: '01',
+     title: 'MHLab β公開',
+     desc: 'モンハン装備シミュレーターとDPS計算をiPhone単体で提供。',
+     icon: Gamepad2,
+@@ -29,6 +32,7 @@ export const timeline: TimelineItem[] = [
+   },
+   {
+     year: '2024',
++    month: '09',
+     title: '合同会社FunterU 設立',
+     desc: '学生起業家として法人化し、プロダクトと受託を統合管理。',
+     icon: Briefcase,
+@@ -37,6 +41,7 @@ export const timeline: TimelineItem[] = [
+   },
+   {
+     year: '2024',
++    month: '04',
+     title: '受託開始（日本語ミュージアム）',
+     desc: '教育系Webアプリを皮切りに受託開発を本格化。',
+     icon: Library,
+diff --git a/site/src/data/types.ts b/site/src/data/types.ts
+index e187e15..ac36371 100644
+--- a/site/src/data/types.ts
++++ b/site/src/data/types.ts
+@@ -53,6 +53,7 @@ export type Project = {
+ 
+ export type TimelineItem = {
+   year: string;
++  month: string;
+   title: string;
+   desc: string;
+   icon: IconComponent;

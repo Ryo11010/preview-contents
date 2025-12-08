@@ -1,0 +1,6 @@
+- [x] Workset 確認／Plan 承認（No-Plan, No-Code 遵守）
+- [x] ハードコード観点整理（設定ファイルのみ追加）
+- [x] before/after/diff/meta の 3+1 整備
+- [x] file-map.md 更新反映
+- [x] Lint 実行（`npm run lint` で警告のみ）
+- [ ] タイムライン／カタログ／インデックス更新（未実施）

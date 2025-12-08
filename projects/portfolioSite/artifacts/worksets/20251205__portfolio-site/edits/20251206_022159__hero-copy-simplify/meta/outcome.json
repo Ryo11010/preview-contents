@@ -1,0 +1,17 @@
+{
+  "editId": "20251206_022159__hero-copy-simplify",
+  "worksetId": "20251205__portfolio-site",
+  "status": "success",
+  "summary": "Simplified the hero headline and subcopy by shortening profile.catchphrase and heroCopy for a clearer personal portfolio message without changing layout or logic.",
+  "testing": {
+    "lint": "not_run",
+    "unit": "not_run",
+    "integration": "not_run",
+    "e2e": "not_run",
+    "notes": "Manual check in dev to confirm the new short headline/subcopy render correctly."
+  },
+  "hardcode": {
+    "policyFollowed": true,
+    "notes": "All text remains centralized in config/data; no secrets or env-specific literals added."
+  }
+}

@@ -1,0 +1,11 @@
+--- artifacts/worksets/20251205__portfolio-site/edits/20251206_033641__gitignore-next-ignore/before/.gitignore	2025-12-06 03:41:25
++++ artifacts/worksets/20251205__portfolio-site/edits/20251206_033641__gitignore-next-ignore/after/.gitignore	2025-12-06 04:10:50
+@@ -6,6 +6,8 @@
+ dist/
+ build/
+ out/
++.next/
++site/.next/
+ **/.next/
+ **/.vercel/
+ **/.turbo/

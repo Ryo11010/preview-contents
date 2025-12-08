@@ -1,0 +1,39 @@
+diff --git a/site/src/components/sections/Work.tsx b/site/src/components/sections/Work.tsx
+index 093f1ff..75027a8 100644
+--- a/site/src/components/sections/Work.tsx
++++ b/site/src/components/sections/Work.tsx
+@@ -6,7 +6,7 @@ import type { WorkSectionProps } from './types';
+ 
+ export const WorkSection: React.FC<WorkSectionProps> = ({ categorizedProjects, categories, onSelectProject }) => (
+   <div id="work" className="max-w-7xl mx-auto px-6 py-24 min-h-screen flex flex-col justify-center">
+-    <SectionHeader icon={Briefcase} title="Work Archives" align="center" />
++    <SectionHeader icon={Briefcase} title="Work Archives — Ryo Tsurutani" align="center" />
+ 
+     <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 justify-items-center">
+       {categories.map((category, index) => {
+@@ -28,7 +28,7 @@ export const WorkSection: React.FC<WorkSectionProps> = ({ categorizedProjects, c
+     </div>
+ 
+     <div className="text-center mt-20 max-w-lg mx-auto text-slate-500 text-sm leading-relaxed">
+-      <p>Folderをタップするとプロジェクトが展開します。<br />各カードを選択して詳細をご覧ください。</p>
++      <p>Tap a folder to explore each project. Select a card to view the details.</p>
+     </div>
+   </div>
+ );
+diff --git a/site/src/data/projects.ts b/site/src/data/projects.ts
+index 927a36f..19a42c4 100644
+--- a/site/src/data/projects.ts
++++ b/site/src/data/projects.ts
+@@ -137,9 +137,9 @@ export const projects: Project[] = [
+ export const projectCategoryIds: readonly ProjectCategory[] = ['app', 'web', 'client'];
+ 
+ export const categories: CategoryConfig[] = [
+-  { id: 'app', label: '自社プロダクト', subLabel: 'Products', icon: Smartphone },
+-  { id: 'web', label: 'コーポレート', subLabel: 'Official Site', icon: Globe },
+-  { id: 'client', label: '受託開発', subLabel: 'Client Works', icon: Briefcase },
++  { id: 'app', label: 'Product Lab', subLabel: 'In-house Apps', icon: Smartphone },
++  { id: 'web', label: 'Official Site', subLabel: 'Corporate', icon: Globe },
++  { id: 'client', label: 'Client Works', subLabel: 'Contract', icon: Briefcase },
+ ];
+ 
+ export const projectCategoryLabel: Record<Project['category'], string> = {

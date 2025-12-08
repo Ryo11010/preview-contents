@@ -1,6 +1,9 @@
 # projects 配下の汎用設定（per-dir 書式）
 RewriteEngine On
 
+# 非公開ファイルへのアクセス拒否
+RewriteRule (^|/)\.(git|env|htaccess|DS_Store|vscode|idea)($|/) - [F]
+
 # 既存ファイル/ディレクトリはそのまま返す
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d

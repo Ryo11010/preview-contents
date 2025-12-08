@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+site/node_modules/
+
+# Build outputs / caches
+dist/
+build/
+out/
+.next/
+site/.next/
+**/.next/
+**/.vercel/
+**/.turbo/
+.cache/
+.parcel-cache/
+.eslintcache
+.swc/
+coverage/
+*.tsbuildinfo
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+logs/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Editor / OS files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+tmp/

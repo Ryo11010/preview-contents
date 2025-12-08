@@ -12,6 +12,7 @@
    - 単階層: `projects/{project-key}/index.html`
    - 二階層: `projects/{project-key}/{environment}/index.html`
 4. 一覧に出す場合は `previews.json` に実在する URL だけを記載（サンプルが不要なら空配列 `[]` のままでOK）。
+5. ローカルで `/projects` に追加/更新したら `node scripts/generate-previews-json.mjs` を実行し、生成された `previews.json` をアップロードする（ソースディレクトリや `.git` は自動で除外）。
 
 ## トラブルシュート
 - 404/500: 配置パスを確認し、`index.html` が存在するかチェック。

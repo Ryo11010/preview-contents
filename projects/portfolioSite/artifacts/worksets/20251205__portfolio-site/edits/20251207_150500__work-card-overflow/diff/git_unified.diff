@@ -1,0 +1,90 @@
+diff --git a/site/src/components/Folder.tsx b/site/src/components/Folder.tsx
+index 74dc29d..9395fef 100644
+--- a/site/src/components/Folder.tsx
++++ b/site/src/components/Folder.tsx
+@@ -46,7 +46,6 @@ const FolderCardItem = ({
+   index,
+   isOpen,
+   isHovered,
+-  isCardHovered,
+   project,
+   totalCards,
+   align = 'center',
+@@ -54,7 +53,6 @@ const FolderCardItem = ({
+   index: number;
+   isOpen: boolean;
+   isHovered: boolean;
+-  isCardHovered: boolean;
+   project?: Project;
+   totalCards: number;
+   align?: 'left' | 'center' | 'right';
+@@ -113,14 +111,7 @@ const FolderCardItem = ({
+ 
+   const centerIndex = (totalCards - 1) / 2;
+   const distFromCenter = Math.abs(index - centerIndex);
+-  const zIndex = (() => {
+-    if (isCardHovered) {
+-      return folderMotion.hoverZIndexBase + index;
+-    }
+-    return isOpen
+-      ? folderMotion.openZIndexBase - Math.floor(distFromCenter)
+-      : folderMotion.closedZIndexBase + index;
+-  })();
++  const zIndex = isOpen ? 50 - Math.floor(distFromCenter) : 10 + index;
+ 
+   const bgGradient = project ? `bg-gradient-to-br ${project.color}` : 'bg-slate-800';
+ 
+@@ -153,7 +144,6 @@ export const FolderComponent = ({
+ }) => {
+   const [isOpen, setIsOpen] = useState(false);
+   const [isHovered, setIsHovered] = useState(false);
+-  const [hoveredCardIndex, setHoveredCardIndex] = useState<number | null>(null);
+   const { isMobile } = useWindowSize();
+ 
+   const effectiveAlign = isMobile ? 'center' : align;
+@@ -179,10 +169,7 @@ export const FolderComponent = ({
+       <div
+         className="relative w-64 h-64 flex items-end justify-center pb-4 cursor-pointer group"
+         onMouseEnter={() => setIsHovered(true)}
+-        onMouseLeave={() => {
+-          setIsHovered(false);
+-          setHoveredCardIndex(null);
+-        }}
++        onMouseLeave={() => setIsHovered(false)}
+         onClick={toggleFolder}
+         style={{ perspective: plateStyle.perspective }}
+       >
+@@ -206,18 +193,11 @@ export const FolderComponent = ({
+ 
+         <div className="absolute bottom-8 w-full flex justify-center items-end">
+           {displayCards.map((proj, idx) => (
+-            <div
+-              key={proj?.id || idx}
+-              onClick={(e) => handleCardClick(e, proj)}
+-              onMouseEnter={() => setHoveredCardIndex(idx)}
+-              onMouseLeave={() => setHoveredCardIndex(null)}
+-              className="contents"
+-            >
++            <div key={proj?.id || idx} onClick={(e) => handleCardClick(e, proj)} className="contents">
+               <FolderCardItem
+                 index={idx}
+                 isOpen={isOpen}
+                 isHovered={isHovered}
+-                isCardHovered={hoveredCardIndex === idx}
+                 project={proj}
+                 totalCards={totalCards}
+                 align={effectiveAlign}
+diff --git a/site/src/config/tokens.ts b/site/src/config/tokens.ts
+index 3c56612..8d3dfb0 100644
+--- a/site/src/config/tokens.ts
++++ b/site/src/config/tokens.ts
+@@ -95,9 +95,6 @@ export const folderMotion = {
+   edgeAnchorOffset: 60,
+   openTiltDegrees: -20,
+   closedTranslateZ: 20,
+-  openZIndexBase: 80,
+-  closedZIndexBase: 12,
+-  hoverZIndexBase: 140,
+ };
+ 
+ export const folderStyle = {

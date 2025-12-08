@@ -1,0 +1,12 @@
+--- before/postcss.config.js	2025-12-05 17:15:40
++++ after/postcss.config.js	2025-12-05 17:16:08
+@@ -1,6 +1,8 @@
++const path = require('node:path');
++
+ module.exports = {
+   plugins: {
+-    tailwindcss: {},
++    tailwindcss: { config: path.join(__dirname, 'tailwind.config.ts') },
+     autoprefixer: {},
+   },
+ };

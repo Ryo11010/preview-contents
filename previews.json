@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "displayName": "portfolioSite (preview)",
+    "projectKey": "portfolioSite",
+    "environment": "preview",
+    "url": "/projects/portfolioSite/preview/",
+    "note": "",
+    "updatedAt": "2025-12-08"
+  },
+  {
+    "displayName": "timetime (stg)",
+    "projectKey": "timetime",
+    "environment": "stg",
+    "url": "/projects/timetime/stg/",
+    "note": "",
+    "updatedAt": "2025-12-08"
+  }
+]

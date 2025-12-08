@@ -22,7 +22,8 @@ tmp/
 !/artifacts/templates/DebugOverlayTemplate.v1.js
 # Workset は後続で有効化：scripts/update-gitignore.mjs --gid <GID>
 
+
 # Workset is unignored below
 !/artifacts/worksets/
-!/artifacts/worksets/20251208_142847__restore/
-!/artifacts/worksets/20251208_142847__restore/**
+!/artifacts/worksets/20251208_182220__auto_preview/
+!/artifacts/worksets/20251208_182220__auto_preview/**

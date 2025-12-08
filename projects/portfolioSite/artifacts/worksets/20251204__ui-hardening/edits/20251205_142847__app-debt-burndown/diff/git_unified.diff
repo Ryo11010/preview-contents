@@ -1,0 +1,330 @@
+diff --git a/app.tsx b/app.tsx
+index cb520c1..4befc05 100644
+--- a/app.tsx
++++ b/app.tsx
+@@ -50,6 +50,8 @@ type SocialLinks = {
+   twitter: string;
+ };
+ 
++type ProjectCategory = 'app' | 'web' | 'client';
++
+ type Interest = {
+   label: string;
+   icon: IconComponent;
+@@ -70,7 +72,7 @@ type Profile = {
+ type Project = {
+   id: string;
+   title: string;
+-  category: string;
++  category: ProjectCategory;
+   year: string;
+   role: string;
+   tagline: string;
+@@ -94,7 +96,7 @@ type TimelineItem = {
+   title: string;
+   desc: string;
+   icon: IconComponent;
+-  projectId: string | null;
++  projectId: Project['id'] | null;
+   color: string;
+ };
+ 
+@@ -106,6 +108,13 @@ type DockTab = {
+   icon: IconComponent;
+ };
+ 
++type CategoryConfig = {
++  id: ProjectCategory;
++  label: string;
++  subLabel: string;
++  icon: IconComponent;
++};
++
+ type SegmentOption<T extends string> = {
+   label: string;
+   value: T;
+@@ -118,8 +127,8 @@ type HeroSectionProps = {
+ };
+ 
+ type WorkSectionProps = {
+-  categorizedProjects: Record<string, Project[]>;
+-  categories: { id: string; label: string; subLabel: string; icon: IconComponent }[];
++  categorizedProjects: Record<ProjectCategory, Project[]>;
++  categories: CategoryConfig[];
+   onSelectProject: (project: Project) => void;
+ };
+ 
+@@ -543,8 +552,15 @@ const PROJECTS: Project[] = [
+   },
+ ];
+ 
++const PROJECT_CATEGORY_IDS: readonly ProjectCategory[] = ['app', 'web', 'client'];
++
++const PROJECT_LOOKUP = PROJECTS.reduce<Record<string, Project>>((acc, project) => {
++  acc[project.id] = project;
++  return acc;
++}, {});
++
+ /* --- ADDED MISSING CATEGORIES DEFINITION --- */
+-const CATEGORIES = [
++const CATEGORIES: CategoryConfig[] = [
+   { id: 'app', label: '自社アプリ', subLabel: 'Personal Apps', icon: Smartphone },
+   { id: 'web', label: '自社サイト', subLabel: 'Official Site', icon: Globe },
+   { id: 'client', label: '受託開発', subLabel: 'Client Works', icon: Briefcase },
+@@ -629,6 +645,9 @@ const BUTTON_SIZES = {
+ 
+ const UI_METRICS = {
+   sectionObserverThreshold: 0.3,
++  breakpoints: {
++    mobile: 768, // px
++  },
+   dock: {
+     paddingX: 8, // px
+     gap: 24, // px
+@@ -643,12 +662,20 @@ const UI_METRICS = {
+ 
+ const openExternalLink = (url: string) => {
+   if (!url || typeof window === 'undefined') return;
+-  window.open(url, '_blank', 'noopener,noreferrer');
++  try {
++    window.open(url, '_blank', 'noopener,noreferrer');
++  } catch {
++    // no-op: keep silent in case window.open is blocked
++  }
+ };
+ 
+ const openMailLink = (email: string) => {
+   if (!email || typeof window === 'undefined') return;
+-  window.location.href = `mailto:${email}`;
++  try {
++    window.location.href = `mailto:${email}`;
++  } catch {
++    // no-op: keep silent when mailto is blocked
++  }
+ };
+ 
+ const safeAlert = (message: string) => {
+@@ -656,10 +683,17 @@ const safeAlert = (message: string) => {
+   window.alert(message);
+ };
+ 
+-const getProjectById = (id: string | null): Project | null =>
+-  PROJECTS.find((project) => project.id === id) || null;
++const getProjectById = (id: Project['id'] | null): Project | null => {
++  if (!id) return null;
++  return PROJECT_LOOKUP[id] ?? null;
++};
+ 
+ const shareContent = (text: string) => {
++  if (!text) {
++    safeAlert(SHARE_COPY.fallback);
++    return;
++  }
++
+   if (typeof navigator !== 'undefined' && 'share' in navigator) {
+     const nav = navigator as Navigator & { share?: (data: ShareData) => Promise<void> };
+     if (nav.share) {
+@@ -676,13 +710,18 @@ const useWindowSize = () => {
+   useEffect(() => {
+     if (typeof window === 'undefined') return;
+     
+-    const checkMobile = () => {
+-      setIsMobile(window.innerWidth < 768);
+-    };
+-    
+-    checkMobile();
+-    window.addEventListener('resize', checkMobile);
+-    return () => window.removeEventListener('resize', checkMobile);
++    const mediaQuery = window.matchMedia(`(max-width:${UI_METRICS.breakpoints.mobile - 1}px)`);
++    const updateIsMobile = () => setIsMobile(mediaQuery.matches);
++
++    updateIsMobile();
++
++    if (mediaQuery.addEventListener) {
++      mediaQuery.addEventListener('change', updateIsMobile);
++      return () => mediaQuery.removeEventListener('change', updateIsMobile);
++    }
++
++    mediaQuery.addListener(updateIsMobile);
++    return () => mediaQuery.removeListener(updateIsMobile);
+   }, []);
+ 
+   return { isMobile };
+@@ -1547,37 +1586,36 @@ const ProjectDetailSheet: React.FC<ProjectDetailSheetProps> = ({ project, onClos
+   useEffect(() => {
+     setActiveMediaIndex(0);
+     if (scrollRef.current) {
+-      scrollRef.current.scrollTo({ left: 0, behavior: 'instant' });
++      scrollRef.current.scrollTo({ left: 0, behavior: 'auto' });
+     }
+   }, [project]);
+ 
++  const hasVideo = Boolean(project?.videoUrl);
++  const galleryCount = project?.gallery.length ?? 0;
++  const totalMedia = (hasVideo ? 1 : 0) + galleryCount;
++
+   const handleScroll = useCallback(() => {
+     const container = scrollRef.current;
+-    if (!container) return;
++    if (!container || totalMedia <= 0) return;
+ 
+-    // Calculate the active index based on scroll position
+-    // Note: We use the first child's width to estimate step size
+-    const firstCard = container.firstElementChild as HTMLElement;
++    const firstCard = container.firstElementChild as HTMLElement | null;
+     if (!firstCard) return;
+ 
+-    const cardWidth = firstCard.offsetWidth;
+-    const gap = UI_METRICS.mediaGalleryGap;
+-    const scrollLeft = container.scrollLeft;
+-    
+-    // Calculate index: round(scrollPosition / (cardWidth + gap))
+-    const index = Math.round(scrollLeft / (cardWidth + gap));
+-    setActiveMediaIndex(index);
+-  }, []);
++    const step = firstCard.offsetWidth + UI_METRICS.mediaGalleryGap;
++    if (step <= 0) return;
++
++    const nextIndex = Math.round(container.scrollLeft / step);
++    const clampedIndex = Math.max(0, Math.min(totalMedia - 1, nextIndex));
++    setActiveMediaIndex(clampedIndex);
++  }, [totalMedia]);
+ 
+   if (!project) return null;
+   
+-  const totalMedia = (project.videoUrl ? 1 : 0) + project.gallery.length;
+-
+   return (
+   <LiquidSheet
+     isOpen={!!project}
+     onClose={onClose}
+-    title={project.category === 'app' ? 'Personal App' : project.category === 'web' ? 'Official Site' : 'Client Work'}
++    title={PROJECT_CATEGORY_LABEL[project.category]}
+     headerRight={<LiquidButton size="sm" variant="ghost" icon={Share} onClick={onShare} />}
+   >
+     <div className="pb-12">
+@@ -1588,7 +1626,7 @@ const ProjectDetailSheet: React.FC<ProjectDetailSheetProps> = ({ project, onClos
+             onScroll={handleScroll}
+             className="flex gap-4 overflow-x-auto pb-4 -mx-6 px-6 snap-x snap-mandatory hide-scrollbar"
+         >
+-          {project.videoUrl && (
++          {hasVideo && (
+             <div className="shrink-0 w-[85%] md:w-[600px] aspect-video rounded-[32px] overflow-hidden shadow-lg snap-center relative bg-black group">
+                {/* Video Placeholder (In a real app, this would be a <video> or <iframe>) */}
+                <img src={DEMO_IMAGES.videoPlaceholder} alt="Video Thumbnail" className="w-full h-full object-cover opacity-80" />
+@@ -1739,12 +1777,15 @@ export default function App() {
+ 
+   // Filter projects by category
+   const categorizedProjects = useMemo(() => {
++    const base = PROJECT_CATEGORY_IDS.reduce<Record<ProjectCategory, Project[]>>((acc, id) => {
++      acc[id] = [];
++      return acc;
++    }, {} as Record<ProjectCategory, Project[]>);
++
+     return PROJECTS.reduce((acc, project) => {
+-        const cat = project.category;
+-        if (!acc[cat]) acc[cat] = [];
+-        acc[cat].push(project);
+-        return acc;
+-    }, {} as Record<string, Project[]>);
++      acc[project.category].push(project);
++      return acc;
++    }, base);
+   }, []);
+ 
+   const scrollTo = useCallback((id: SectionId) => {
+@@ -1807,4 +1848,4 @@ export default function App() {
+       />
+     </LiquidContainer>
+   );
+-}
+\ No newline at end of file
++}
+diff --git a/artifacts/_catalog.md b/artifacts/_catalog.md
+index 4d390c3..6fbb467 100644
+--- a/artifacts/_catalog.md
++++ b/artifacts/_catalog.md
+@@ -2,3 +2,4 @@
+ 
+ - UI/Frontend
+   - Workset `20251204__ui-hardening`: Portfolio React UI technical debt reduction (single-file constraint, maintain existing preview/UX). Status: Edits `20251204_150627__ui-refactor`, `20251204_211221__folder-interaction`, `20251204_214311__app-hardening`, `20251204_230100__app-native-ready` completed.
++    - Completed: `20251205_142847__app-debt-burndown` — app.tsx hardened with typed categories, centralized labels/lookup, guarded browser actions, and stabilized responsive/gallery behavior while keeping single-file UI/preview unchanged.
+diff --git a/artifacts/_index.json b/artifacts/_index.json
+index 9a46150..56a510b 100644
+--- a/artifacts/_index.json
++++ b/artifacts/_index.json
+@@ -20,6 +20,10 @@
+         {
+           "id": "20251204_230100__app-native-ready",
+           "status": "completed"
++        },
++        {
++          "id": "20251205_142847__app-debt-burndown",
++          "status": "completed"
+         }
+       ]
+     }
+diff --git a/artifacts/_timeline.md b/artifacts/_timeline.md
+index 8648b0e..6f39305 100644
+--- a/artifacts/_timeline.md
++++ b/artifacts/_timeline.md
+@@ -5,3 +5,4 @@
+ - 2025-12-04: Edit `20251204_211221__folder-interaction` completed — FolderInteraction mockup refactored with typed layouts, motion/config constants, and reusable skeleton blocks; UI/preview preserved.
+ - 2025-12-04: Edit `20251204_214311__app-hardening` completed — app.tsx reorganized into section components with guarded helpers and centralized tokens while keeping existing UI and canvas preview.
+ - 2025-12-04: Edit `20251204_230100__app-native-ready` completed — platform bridge added to isolate browser APIs, section observer guarded, and single-file UI/preview preserved for RN readiness.
++- 2025-12-05: Edit `20251205_142847__app-debt-burndown` completed — app.tsx hardened with typed categories, centralized labels/lookup, guarded browser actions, and stabilized responsive/gallery behavior while keeping the single-file UI and canvas preview unchanged.
+diff --git a/artifacts/file-map.md b/artifacts/file-map.md
+index 0d9274e..b6e035d 100644
+--- a/artifacts/file-map.md
++++ b/artifacts/file-map.md
+@@ -61,3 +61,14 @@ artifacts/ — SSOT。全 Workset/編集履歴を格納。
+ - artifacts/worksets/20251204__ui-hardening/edits/20251204_230100__app-native-ready/meta/qa_checklist.md — チェックリスト。
+ - artifacts/worksets/20251204__ui-hardening/edits/20251204_230100__app-native-ready/attachments/ — スクリーンショット等の置き場（空）。
+ - artifacts/worksets/20251204__ui-hardening/edits/20251204_230100__app-native-ready/contracts/ — 契約変更がある場合の置き場（空）。
++- artifacts/worksets/20251204__ui-hardening/edits/20251205_142847__app-debt-burndown/before/app.tsx — 本 Edit の変更前スナップショット。
++- artifacts/worksets/20251204__ui-hardening/edits/20251205_142847__app-debt-burndown/before/manifest_before.json — before スナップショットの SHA-256。
++- artifacts/worksets/20251204__ui-hardening/edits/20251205_142847__app-debt-burndown/after/app.tsx — 本 Edit の変更後スナップショット。
++- artifacts/worksets/20251204__ui-hardening/edits/20251205_142847__app-debt-burndown/after/manifest_after.json — after スナップショットの SHA-256。
++- artifacts/worksets/20251204__ui-hardening/edits/20251205_142847__app-debt-burndown/diff/git_unified.diff — 本 Edit の差分（git unified 形式）。
++- artifacts/worksets/20251204__ui-hardening/edits/20251205_142847__app-debt-burndown/meta/plan.md — 本 Edit の計画（承認済み）。
++- artifacts/worksets/20251204__ui-hardening/edits/20251205_142847__app-debt-burndown/meta/evaluation.md — 本 Edit の評価・検証結果（今回作成）。
++- artifacts/worksets/20251204__ui-hardening/edits/20251205_142847__app-debt-burndown/meta/outcome.json — 本 Edit の構造化アウトカム（今回作成）。
++- artifacts/worksets/20251204__ui-hardening/edits/20251205_142847__app-debt-burndown/meta/qa_checklist.md — 本 Edit のチェックリスト（今回作成）。
++- artifacts/worksets/20251204__ui-hardening/edits/20251205_142847__app-debt-burndown/attachments/ — スクリーンショット等の置き場（空）。
++- artifacts/worksets/20251204__ui-hardening/edits/20251205_142847__app-debt-burndown/contracts/ — 契約変更がある場合の置き場（空）。
+diff --git a/artifacts/worksets/20251204__ui-hardening/WORKSET.md b/artifacts/worksets/20251204__ui-hardening/WORKSET.md
+index 06044a0..c2c0075 100644
+--- a/artifacts/worksets/20251204__ui-hardening/WORKSET.md
++++ b/artifacts/worksets/20251204__ui-hardening/WORKSET.md
+@@ -27,3 +27,4 @@
+ - 2025-12-04: Edit `20251204_211221__folder-interaction` — FolderInteraction モックを定数・型・再利用コンポーネントで整理し、UI/プレビューを維持したまま負債を削減。
+ - 2025-12-04: Edit `20251204_214311__app-hardening` — app.tsx をセクション単位のコンポーネント化とヘルパー集約で安定化（UI/プレビュー維持）。
+ - 2025-12-04: Edit `20251204_230100__app-native-ready` — DOM/ブラウザ依存処理をプラットフォームブリッジに集約し、セクション監視やシェア/リンク操作をガード化して RN 移行を見据えた安定化を実施（UI/プレビュー不変）。
++- 2025-12-05: Edit `20251205_142847__app-debt-burndown` — app.tsx を型強化（カテゴリ Union 化）、定数/ラベル/辞書の集中管理、ブラウザ API ガード、レスポンシブ・ギャラリー挙動の安定化で負債を除去（UI/プレビュー不変）。
+diff --git a/artifacts/worksets/20251204__ui-hardening/_index.json b/artifacts/worksets/20251204__ui-hardening/_index.json
+index 876bbcd..8d3b4b5 100644
+--- a/artifacts/worksets/20251204__ui-hardening/_index.json
++++ b/artifacts/worksets/20251204__ui-hardening/_index.json
+@@ -29,6 +29,13 @@
+       "summary": "Isolated browser-specific actions behind a platform bridge and tightened observers for RN readiness while keeping the UI/preview unchanged.",
+       "createdAt": "2025-12-04T23:01:00",
+       "completedAt": "2025-12-04T23:30:00"
++    },
++    {
++      "id": "20251205_142847__app-debt-burndown",
++      "status": "completed",
++      "summary": "Hardened app.tsx with typed categories, centralized lookups, guarded browser actions, and stabilized gallery/responsive behavior while keeping the single-file UI and canvas preview unchanged.",
++      "createdAt": "2025-12-05T14:28:47",
++      "completedAt": "2025-12-05T15:00:00"
+     }
+   ]
+ }
+diff --git a/artifacts/worksets/20251204__ui-hardening/_index.md b/artifacts/worksets/20251204__ui-hardening/_index.md
+index 6ae16a7..71a948c 100644
+--- a/artifacts/worksets/20251204__ui-hardening/_index.md
++++ b/artifacts/worksets/20251204__ui-hardening/_index.md
+@@ -4,3 +4,4 @@
+ - 20251204_211221__folder-interaction — Status: Completed — Refactored FolderInteraction mockup with typed layouts, motion/config constants, and reusable skeleton blocks while keeping UI/preview unchanged.
+ - 20251204_214311__app-hardening — Status: Completed — Reorganized app.tsx into section components with guarded helpers and centralized tokens while maintaining the existing UI and canvas preview.
+ - 20251204_230100__app-native-ready — Status: Completed — Isolated browser-specific actions behind a platform bridge, tightened section observation guards, and kept the single-file UI/preview unchanged while preparing for RN migration.
++- 20251205_142847__app-debt-burndown — Status: Completed — Typed project categories, centralized category labels and project lookup, guarded browser actions, stabilized responsive detection, and clamped media gallery indexing while keeping the single-file UI and canvas preview unchanged.

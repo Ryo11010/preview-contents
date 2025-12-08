@@ -1,0 +1,5 @@
+- Result: Success
+- Scope: Work セクションを英語メインへ変更。カテゴリラベルを `Product Lab / In-house Apps`, `Official Site / Corporate`, `Client Works / Contract` に更新し、下部説明を英語化。見出しに「Ryo Tsurutani」を追加。
+- Verification: 自動テスト/ lint 未実施。`npm run dev` でカテゴリ表示・説明が英語主体になっていることを手動確認してください。
+- Hardcode policy: 文言は data/コンポーネント内に集約し、不要な直書きなし。秘密情報なし。
+- Risks / Follow-ups: 折返しが気になる場合は文言微調整を検討。

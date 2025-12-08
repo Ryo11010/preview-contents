@@ -1,0 +1,704 @@
+diff --git a/artifacts/_catalog.md b/artifacts/_catalog.md
+index 0de7878..436b0b0 100644
+--- a/artifacts/_catalog.md
++++ b/artifacts/_catalog.md
+@@ -14,3 +14,4 @@
+     - Completed: `20251206_023552__hero-english-motto` — Converted the hero headline to a concise English motto (data-only change).
+     - Completed: `20251206_025034__hero-status-catchy` — Updated the hero badge text to a catchier line while keeping layout unchanged.
+     - Completed: `20251206_033641__gitignore-next-ignore` — Added explicit `.next/` ignore rules and removed tracked `site/.next` artifacts from the index to eliminate Git noise.
++    - Completed: `20251206_114500__portfolio-refactor-quality` — Centralized copy/tokens (background/folder motion/sheet thresholds), adopted `next/image` for galleries, lint passed; build blocked offline by Google Fonts fetch.
+diff --git a/artifacts/_index.json b/artifacts/_index.json
+index 58b6bd6..91897e7 100644
+--- a/artifacts/_index.json
++++ b/artifacts/_index.json
+@@ -75,6 +75,10 @@
+         {
+           "id": "20251206_033641__gitignore-next-ignore",
+           "status": "completed"
++        },
++        {
++          "id": "20251206_114500__portfolio-refactor-quality",
++          "status": "completed"
+         }
+       ]
+     }
+diff --git a/artifacts/_timeline.md b/artifacts/_timeline.md
+index 9d26996..48a1b09 100644
+--- a/artifacts/_timeline.md
++++ b/artifacts/_timeline.md
+@@ -18,3 +18,4 @@
+ - 2025-12-06: Edit `20251206_023552__hero-english-motto` completed — Converted the hero headline to a concise English motto (data-only change).
+ - 2025-12-06: Edit `20251206_025034__hero-status-catchy` completed — Updated the hero badge text to a catchier line while keeping layout unchanged.
+ - 2025-12-06: Edit `20251206_033641__gitignore-next-ignore` completed — Added explicit `.next/` and `site/.next/` ignore rules and removed tracked `site/.next` artifacts from the index to eliminate Git status noise.
++- 2025-12-06: Edit `20251206_114500__portfolio-refactor-quality` completed — Centralized copy/tokens, moved gallery media to `next/image`, tokenized folder/sheet metrics, lint passed; build blocked offline by Google Fonts fetch.
+diff --git a/artifacts/file-map.md b/artifacts/file-map.md
+index 3f50949..c524b12 100644
+--- a/artifacts/file-map.md
++++ b/artifacts/file-map.md
+@@ -11,7 +11,7 @@
+ site/ — Next.js App Router で実装した新ポートフォリオ（/mockup とは分離）。
+ - site/package.json — Next.js/React/Tailwind/Framer Motion 依存とスクリプト定義。
+ - site/tsconfig.json — TypeScript 設定（@/* パスエイリアス）。
+-- site/next.config.mjs — 画像リモート許可・typedRoutes 設定。
++- site/next.config.mjs — 画像リモート許可（Unsplash/FunterU assets）・typedRoutes 設定。
+ - site/next-env.d.ts — Next TypeScript 用アンビエント宣言。
+ - site/tailwind.config.ts — Tailwind テーマ拡張とスキャン対象。
+ - site/postcss.config.mjs — PostCSS 設定。
+@@ -19,7 +19,8 @@ site/ — Next.js App Router で実装した新ポートフォリオ（/mockup 
+ - site/app/page.tsx — クライアント側ページ本体（セクション構成・状態/ハンドラ）。
+ - site/app/globals.css — グローバルスタイルとスクロールバー調整。
+ - site/src/config/site.ts — サイトメタ（タイトル/説明/baseUrl/OG/メール）。
+-- site/src/config/tokens.ts — UI トークン（テクスチャ、コピー、メトリクス、ボタンスタイル）。
++- site/src/config/tokens.ts — UI トークン（テクスチャ/背景レイヤー/フォルダモーション/ボタン/メトリクス/シート設定）。
++- site/src/config/copy.ts — セクション文言・CTA・シェア/プロジェクト詳細コピー・About タブ定義。
+ - site/src/data/types.ts — プロファイル/プロジェクト/タイムライン等の型定義。
+ - site/src/data/profile.ts — プロフィールコンテンツ（氏名/ロール/スキル/興味/連絡先）。
+ - site/src/data/projects.ts — プロジェクトデータ、カテゴリ設定、デモ画像、ラベル辞書。
+diff --git a/artifacts/worksets/20251205__portfolio-site/WORKSET.md b/artifacts/worksets/20251205__portfolio-site/WORKSET.md
+index 294d86e..98cb204 100644
+--- a/artifacts/worksets/20251205__portfolio-site/WORKSET.md
++++ b/artifacts/worksets/20251205__portfolio-site/WORKSET.md
+@@ -27,3 +27,4 @@
+ - 2025-12-05: Workset 起票。Edit `20251205_145824__portfolio-site-build` で Next.js 実装計画を策定（承認待ち）。
+ - 2025-12-06: Edit `20251206_013025__gitignore-cleanup` 完了 — ルート `.gitignore` を拡充し、Next/Node のビルド成果物・キャッシュ・ログ・OS ファイルを除外して Git ノイズを削減。
+ - 2025-12-06: Edit `20251206_033641__gitignore-next-ignore` 完了 — `.next/` と `site/.next/` を明示的に無視し、既存の `site/.next` 追跡分をインデックスから除外。
++- 2025-12-06: Edit `20251206_114500__portfolio-refactor-quality` 実施 — セクション文言/コピーを `config/copy.ts` に集約し、背景/フォルダモーション/シート閾値をトークン化、ギャラリーを `next/image` へ移行して lint 通過。ビルドは Google Fonts (Manrope) の取得がオフラインで失敗するため要ネットワーク環境。
+diff --git a/artifacts/worksets/20251205__portfolio-site/_index.json b/artifacts/worksets/20251205__portfolio-site/_index.json
+index 06957a2..182fe43 100644
+--- a/artifacts/worksets/20251205__portfolio-site/_index.json
++++ b/artifacts/worksets/20251205__portfolio-site/_index.json
+@@ -47,6 +47,10 @@
+       {
+         "id": "20251206_033641__gitignore-next-ignore",
+         "status": "completed"
++      },
++      {
++        "id": "20251206_114500__portfolio-refactor-quality",
++        "status": "completed"
+       }
+     ]
+   }
+diff --git a/artifacts/worksets/20251205__portfolio-site/_index.md b/artifacts/worksets/20251205__portfolio-site/_index.md
+index d17720a..9c06c9d 100644
+--- a/artifacts/worksets/20251205__portfolio-site/_index.md
++++ b/artifacts/worksets/20251205__portfolio-site/_index.md
+@@ -11,3 +11,4 @@
+ - 20251206_023552__hero-english-motto — Status: Completed — Converted the hero headline to a concise English motto (data-only change).
+ - 20251206_025034__hero-status-catchy — Status: Completed — Updated the hero badge text to a catchier line while keeping layout unchanged.
+ - 20251206_033641__gitignore-next-ignore — Status: Completed — Added explicit `.next/` and `site/.next/` ignore rules and removed tracked `site/.next` artifacts from the index to stop Git noise.
++- 20251206_114500__portfolio-refactor-quality — Status: Completed — Centralized copy/tokens (background/folder motion/sheet thresholds), moved gallery to `next/image`, lint passed; build blocked offline by Google Fonts fetch.
+diff --git a/site/app/page.tsx b/site/app/page.tsx
+index ff79d72..b2be180 100644
+--- a/site/app/page.tsx
++++ b/site/app/page.tsx
+@@ -15,16 +15,12 @@ import { dockTabs } from '@/data/navigation';
+ import { Project, SectionId } from '@/data/types';
+ import { useSectionObserver } from '@/utils/use-section-observer';
+ import { openMailLink } from '@/utils/links';
+-
+-const aboutOptions = [
+-  { label: 'Technical Skills', value: 'skills' as const },
+-  { label: 'Personal Interests', value: 'interests' as const },
+-];
++import { AboutTabValue, aboutTabs } from '@/config/copy';
+ 
+ export default function Page() {
+   const [activeSection, setActiveSection] = useState<SectionId>('hero');
+   const [selectedProject, setSelectedProject] = useState<null | (typeof projects)[number]>(null);
+-  const [aboutTab, setAboutTab] = useState<'skills' | 'interests'>('skills');
++  const [aboutTab, setAboutTab] = useState<AboutTabValue>('skills');
+ 
+   const categorizedProjects = useMemo(() => {
+     const base = projectCategoryIds.reduce((acc, id) => {
+@@ -78,7 +74,7 @@ export default function Page() {
+       <AboutSection
+         profile={profile}
+         aboutTab={aboutTab}
+-        options={aboutOptions}
++        options={aboutTabs}
+         onChangeTab={setAboutTab}
+         onContact={handleContact}
+       />
+diff --git a/site/next.config.mjs b/site/next.config.mjs
+index 499c34b..da22e28 100644
+--- a/site/next.config.mjs
++++ b/site/next.config.mjs
+@@ -2,7 +2,8 @@
+ const nextConfig = {
+   images: {
+     remotePatterns: [
+-      { protocol: 'https', hostname: 'images.unsplash.com' }
++      { protocol: 'https', hostname: 'images.unsplash.com' },
++      { protocol: 'https', hostname: 'www.funteru.co.jp' },
+     ],
+   },
+   experimental: {
+diff --git a/site/src/components/Folder.tsx b/site/src/components/Folder.tsx
+index dfce920..16291f5 100644
+--- a/site/src/components/Folder.tsx
++++ b/site/src/components/Folder.tsx
+@@ -1,5 +1,6 @@
+ import React, { useState } from 'react';
+-import { textures, plateStyle, uiMetrics } from '@/config/tokens';
++import { folderMotion, folderStyle, plateStyle, textures } from '@/config/tokens';
++import { folderCopy } from '@/config/copy';
+ import type { Project, ProjectCategory } from '@/data/types';
+ import { useWindowSize } from '@/utils/use-window-size';
+ import { Smartphone } from 'lucide-react';
+@@ -58,41 +59,48 @@ const FolderCardItem = ({
+ }) => {
+   const getTransform = () => {
+     if (isOpen) {
+-      if (totalCards === 1) return 'translateY(-160px) rotate(0deg)';
++      if (totalCards === 1) return `translateY(${folderMotion.openYOffset}px) rotate(0deg)`;
+ 
+-      const baseSpread = 120;
+-      const spreadIncrement = 15;
+-      const maxSpread = 240;
+-      const spreadX = Math.min(baseSpread + Math.max(0, totalCards - 3) * spreadIncrement, maxSpread);
++      const spreadX = Math.min(
++        folderMotion.baseSpread + Math.max(0, totalCards - 3) * folderMotion.spreadIncrement,
++        folderMotion.maxSpread,
++      );
+ 
+       const centerOffset = (totalCards - 1) / 2;
++      const safeCenterOffset = centerOffset === 0 ? 1 : centerOffset;
+       const relativeIndex = index - centerOffset;
+ 
+-      let x = relativeIndex * (spreadX / (totalCards - 1 || 1)) * 2;
+-      const maxRotate = Math.min(10 + Math.max(0, totalCards - 3) * 1.5, 25);
+-      let rotate = relativeIndex * (maxRotate / centerOffset || 1);
++      const spreadDivider = Math.max(totalCards - 1, 1);
++      let x = relativeIndex * (spreadX / spreadDivider) * 2;
++      const maxRotate = Math.min(
++        folderMotion.maxRotateBase + Math.max(0, totalCards - 3) * folderMotion.maxRotateIncrement,
++        folderMotion.maxRotateCap,
++      );
++      let rotate = relativeIndex * (maxRotate / safeCenterOffset);
+ 
+-      const yBase = -160;
+-      const archIntensity = 8;
+-      const y = yBase - Math.abs(relativeIndex) * archIntensity;
++      const y = folderMotion.openYOffset - Math.abs(relativeIndex) * folderMotion.archIntensity;
+ 
+-      const shiftAmount = Math.min(Math.max(40, totalCards * 15), 160);
++      const shiftAmount = Math.min(
++        Math.max(folderMotion.alignShiftBase, totalCards * folderMotion.alignShiftScale),
++        folderMotion.alignShiftMax,
++      );
+ 
+       if (align === 'left') {
+         x += shiftAmount;
+-        rotate += 5;
++        rotate += folderMotion.alignRotateAdjust;
+       } else if (align === 'right') {
+         x -= shiftAmount;
+-        rotate -= 5;
++        rotate -= folderMotion.alignRotateAdjust;
+       }
+ 
+       return `translate(${x}px, ${y}px) rotate(${rotate}deg)`;
+     }
+ 
+     if (isHovered) {
+-      const x = -20 + (40 / (totalCards - 1 || 1)) * index;
+-      const rotate = -5 + (10 / (totalCards - 1 || 1)) * index;
+-      return `translate(${x}px, -60px) rotate(${rotate}deg)`;
++      const hoverDivider = Math.max(totalCards - 1, 1);
++      const x = folderMotion.hoverTranslateX + (folderMotion.hoverTranslateRange / hoverDivider) * index;
++      const rotate = folderMotion.hoverRotateStart + (folderMotion.hoverRotateRange / hoverDivider) * index;
++      return `translate(${x}px, ${folderMotion.hoverTranslateY}px) rotate(${rotate}deg)`;
+     }
+ 
+     return 'translate(0, 0) rotate(0deg)';
+@@ -162,15 +170,22 @@ export const FolderComponent = ({
+         onClick={toggleFolder}
+         style={{ perspective: plateStyle.perspective }}
+       >
+-      <div
+-        className="absolute bottom-4 w-[17rem] h-52 bg-[#75BCE6] rounded-3xl z-0 transition-transform duration-300 ease-out"
+-        style={{
+-          transform: `scale(${isOpen ? 0.95 : 1})`,
+-          boxShadow: '0 20px 50px -10px rgba(0,0,0,0.4)',
+-        }}
+-      >
+-          <div className="absolute -top-4 left-0 w-24 h-10 bg-[#75BCE6] rounded-t-2xl border-t border-white/10" />
+-          <div className="w-full h-full opacity-30 mix-blend-overlay rounded-3xl" style={{ backgroundImage: `url(${textures.stardust})` }} />
++        <div
++          className="absolute bottom-4 w-[17rem] h-52 rounded-3xl z-0 transition-transform duration-300 ease-out"
++          style={{
++            transform: `scale(${isOpen ? 0.95 : 1})`,
++            boxShadow: folderStyle.plateShadow,
++            backgroundColor: folderStyle.plateColor,
++          }}
++        >
++          <div
++            className="absolute -top-4 left-0 w-24 h-10 rounded-t-2xl border-t border-white/10"
++            style={{ backgroundColor: folderStyle.plateColor }}
++          />
++          <div
++            className={`w-full h-full rounded-3xl ${folderStyle.plateNoiseClass}`}
++            style={{ backgroundImage: `url(${textures.stardust})` }}
++          />
+         </div>
+ 
+         <div className="absolute bottom-8 w-full flex justify-center items-end">
+@@ -186,8 +201,8 @@ export const FolderComponent = ({
+           style={{
+             transformOrigin: 'bottom center',
+             transformStyle: 'preserve-3d',
+-            transform: `rotateX(${isOpen ? -20 : 0}deg) translateZ(${isOpen ? 0 : 20}px)`,
+-            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.3)',
++            transform: `rotateX(${isOpen ? folderMotion.openTiltDegrees : 0}deg) translateZ(${isOpen ? 0 : folderMotion.closedTranslateZ}px)`,
++            boxShadow: folderStyle.coverShadow,
+           }}
+         >
+           <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-white/10 rounded-[24px] pointer-events-none" />
+@@ -212,12 +227,12 @@ export const FolderComponent = ({
+             style={{ backgroundImage: `url("${textures.noise}")` }}
+           />
+         </div>
+-      </div>
+-      <p className="text-sm font-medium text-slate-400 mt-2 transition-opacity duration-300">
+-        {isOpen ? 'Select a project' : `${projects.length} Projects`}
+-      </p>
+     </div>
+-  );
++    <p className="text-sm font-medium text-slate-400 mt-2 transition-opacity duration-300">
++      {isOpen ? folderCopy.openLabel : folderCopy.getProjectCountLabel(projects.length)}
++    </p>
++  </div>
++);
+ };
+ 
+ export type CategorizedProjects = Record<ProjectCategory, Project[]>;
+diff --git a/site/src/components/LiquidContainer.tsx b/site/src/components/LiquidContainer.tsx
+index 8cadaad..679069e 100644
+--- a/site/src/components/LiquidContainer.tsx
++++ b/site/src/components/LiquidContainer.tsx
+@@ -1,5 +1,5 @@
+ import React from 'react';
+-import { textures } from '@/config/tokens';
++import { backgroundTokens, textures } from '@/config/tokens';
+ 
+ interface LiquidContainerProps {
+   children: React.ReactNode;
+@@ -14,23 +14,23 @@ export const LiquidContainer: React.FC<LiquidContainerProps> = ({
+   backgroundClassName = '',
+   showNoise = true,
+ }) => (
+-  <div className={`relative min-h-screen w-full overflow-hidden font-sans text-slate-900 bg-[#F0F2F5] ${className}`}>
++  <div
++    className={`relative min-h-screen w-full overflow-hidden font-sans text-slate-900 ${backgroundTokens.baseColorClass} ${className}`}
++  >
+     <div className={`fixed inset-0 z-0 pointer-events-none ${backgroundClassName}`}>
+-      <div className="absolute inset-0 bg-gradient-to-tr from-[#Eef2f3] via-[#E2E2E2] to-[#C9D6FF]" />
+-      <div
+-        className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] rounded-full bg-gradient-to-r from-cyan-300/30 to-blue-300/30 blur-[120px] animate-pulse"
+-        style={{ animationDuration: '15s' }}
+-      />
+-      <div
+-        className="absolute bottom-[-10%] right-[-20%] w-[60%] h-[60%] rounded-full bg-gradient-to-l from-purple-300/30 to-pink-300/30 blur-[120px] animate-pulse"
+-        style={{ animationDuration: '18s' }}
+-      />
+-      <div
+-        className="absolute top-[30%] right-[20%] w-[40%] h-[40%] rounded-full bg-yellow-200/20 blur-[100px] animate-pulse"
+-        style={{ animationDuration: '20s' }}
+-      />
++      <div className={`absolute inset-0 ${backgroundTokens.gradientClass}`} />
++      {backgroundTokens.blobs.map((blob, index) => (
++        <div
++          key={index}
++          className={`${blob.className} animate-pulse`}
++          style={{ animationDuration: `${blob.durationSec}s` }}
++        />
++      ))}
+       {showNoise && (
+-        <div className="absolute inset-0 opacity-[0.04] mix-blend-overlay" style={{ backgroundImage: `url("${textures.noise}")` }} />
++        <div
++          className={`absolute inset-0 ${backgroundTokens.noiseOpacityClass} mix-blend-overlay`}
++          style={{ backgroundImage: `url("${textures.noise}")` }}
++        />
+       )}
+     </div>
+     <div className="relative z-10 h-full">{children}</div>
+diff --git a/site/src/components/LiquidSheet.tsx b/site/src/components/LiquidSheet.tsx
+index 2b00365..2fadde3 100644
+--- a/site/src/components/LiquidSheet.tsx
++++ b/site/src/components/LiquidSheet.tsx
+@@ -1,4 +1,5 @@
+ import React, { useEffect, useRef, useState } from 'react';
++import { sheetMetrics } from '@/config/tokens';
+ 
+ interface LiquidSheetProps {
+   isOpen: boolean;
+@@ -34,7 +35,7 @@ export const LiquidSheet: React.FC<LiquidSheetProps> = ({ isOpen, onClose, child
+   };
+ 
+   const handleTouchEnd = () => {
+-    if (dragY > 100) {
++    if (dragY > sheetMetrics.dragCloseThreshold) {
+       onClose();
+     }
+     setDragY(0);
+@@ -47,7 +48,7 @@ export const LiquidSheet: React.FC<LiquidSheetProps> = ({ isOpen, onClose, child
+   return (
+     <div className="fixed inset-0 z-[100] flex items-end justify-center pointer-events-none">
+       <div
+-        className={`absolute inset-0 bg-slate-900/20 backdrop-blur-[4px] transition-opacity duration-500 pointer-events-auto ${
++        className={`absolute inset-0 ${sheetMetrics.overlayOpacityClass} ${sheetMetrics.overlayBlurClass} transition-opacity duration-500 pointer-events-auto ${
+           isOpen ? 'opacity-100' : 'opacity-0'
+         }`}
+         onClick={onClose}
+@@ -55,7 +56,7 @@ export const LiquidSheet: React.FC<LiquidSheetProps> = ({ isOpen, onClose, child
+       <div
+         className={`
+           pointer-events-auto
+-          relative w-full max-w-2xl h-[92vh] 
++          relative w-full max-w-2xl ${sheetMetrics.containerHeightClass} 
+           bg-white/80 backdrop-blur-3xl 
+           shadow-[0_-20px_60px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.8)]
+           rounded-t-[40px] border-t border-white/60
+diff --git a/site/src/components/ProjectDetailSheet.tsx b/site/src/components/ProjectDetailSheet.tsx
+index e0ed103..5505f8c 100644
+--- a/site/src/components/ProjectDetailSheet.tsx
++++ b/site/src/components/ProjectDetailSheet.tsx
+@@ -1,11 +1,13 @@
++import Image from 'next/image';
+ import React, { useCallback, useEffect, useRef, useState } from 'react';
+ import { Cpu, ExternalLink, Github, Globe, Image as ImageIcon, Play, Share } from 'lucide-react';
+-import { LiquidSheet } from './LiquidSheet';
+-import { LiquidButton } from './LiquidButton';
++import { projectSheetCopy } from '@/config/copy';
++import { uiMetrics } from '@/config/tokens';
+ import type { Project } from '@/data/types';
+ import { demoImages, projectCategoryLabel } from '@/data/projects';
+-import { uiMetrics } from '@/config/tokens';
+ import { openExternalLink, shareContent } from '@/utils/links';
++import { LiquidSheet } from './LiquidSheet';
++import { LiquidButton } from './LiquidButton';
+ 
+ interface ProjectDetailSheetProps {
+   project: Project | null;
+@@ -56,13 +58,21 @@ export const ProjectDetailSheet: React.FC<ProjectDetailSheetProps> = ({ project,
+           <div ref={scrollRef} onScroll={handleScroll} className="flex gap-4 overflow-x-auto pb-4 -mx-6 px-6 snap-x snap-mandatory hide-scrollbar">
+             {hasVideo && (
+               <div className="shrink-0 w-[85%] md:w-[600px] aspect-video rounded-[32px] overflow-hidden shadow-lg snap-center relative bg-black group">
+-                <img src={project.videoUrl || demoImages.videoPlaceholder} alt="Video Thumbnail" className="w-full h-full object-cover opacity-80" />
++                <Image
++                  src={project.videoUrl || demoImages.videoPlaceholder}
++                  alt={projectSheetCopy.promoBadge}
++                  fill
++                  className="object-cover opacity-80"
++                  sizes="(min-width: 768px) 600px, 85vw"
++                />
+                 <div className="absolute inset-0 flex items-center justify-center">
+                   <div className="w-16 h-16 bg-white/30 backdrop-blur-md rounded-full flex items-center justify-center transition-transform group-hover:scale-110">
+                     <Play fill="white" className="text-white ml-1" size={32} />
+                   </div>
+                 </div>
+-                <div className="absolute bottom-4 right-4 bg-black/60 text-white text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm">Promo Video</div>
++                <div className="absolute bottom-4 right-4 bg-black/60 text-white text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm">
++                  {projectSheetCopy.promoBadge}
++                </div>
+               </div>
+             )}
+ 
+@@ -71,9 +81,15 @@ export const ProjectDetailSheet: React.FC<ProjectDetailSheetProps> = ({ project,
+                 key={idx}
+                 className="shrink-0 w-[85%] md:w-[600px] aspect-video rounded-[32px] overflow-hidden shadow-lg snap-center bg-slate-100 relative"
+               >
+-                <img src={img} alt={`Gallery ${idx + 1}`} className="w-full h-full object-cover" />
++                <Image
++                  src={img}
++                  alt={`${projectSheetCopy.galleryLabel} ${idx + 1}`}
++                  fill
++                  className="object-cover"
++                  sizes="(min-width: 768px) 600px, 85vw"
++                />
+                 <div className="absolute bottom-4 right-4 bg-black/60 text-white text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm flex items-center gap-1">
+-                  <ImageIcon size={12} /> Gallery {idx + 1}
++                  <ImageIcon size={12} /> {projectSheetCopy.galleryLabel} {idx + 1}
+                 </div>
+               </div>
+             ))}
+@@ -107,11 +123,15 @@ export const ProjectDetailSheet: React.FC<ProjectDetailSheetProps> = ({ project,
+           <div className="bg-slate-50/80 border border-slate-100 rounded-[24px] p-8 text-slate-700 shadow-sm">
+             <div className="grid grid-cols-2 gap-8 mb-6 pb-6 border-b border-slate-200">
+               <div>
+-                <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Year</div>
++                <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">
++                  {projectSheetCopy.labels.year}
++                </div>
+                 <div className="text-lg font-black text-slate-900">{project.year}</div>
+               </div>
+               <div>
+-                <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Role</div>
++                <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">
++                  {projectSheetCopy.labels.role}
++                </div>
+                 <div className="text-lg font-black text-slate-900">{project.role}</div>
+               </div>
+             </div>
+@@ -120,7 +140,7 @@ export const ProjectDetailSheet: React.FC<ProjectDetailSheetProps> = ({ project,
+ 
+           <div>
+             <h3 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+-              <span className="text-yellow-500">★</span> Key Features
++              <span className="text-yellow-500">★</span> {projectSheetCopy.headings.features}
+             </h3>
+             <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+               {project.features.map((feature, i) => (
+@@ -139,7 +159,7 @@ export const ProjectDetailSheet: React.FC<ProjectDetailSheetProps> = ({ project,
+ 
+           <div>
+             <h3 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+-              <Cpu className="text-indigo-500" /> Technical Deep Dive
++              <Cpu className="text-indigo-500" /> {projectSheetCopy.headings.tech}
+             </h3>
+             <div className="bg-slate-50 text-slate-700 border border-slate-200 rounded-[24px] p-6 shadow-sm">
+               <p className="leading-relaxed text-base font-medium">{project.challenges}</p>
+@@ -149,7 +169,7 @@ export const ProjectDetailSheet: React.FC<ProjectDetailSheetProps> = ({ project,
+           <div className="flex flex-col gap-3 pt-4">
+             {project.appStoreUrl && (
+               <LiquidButton size="lg" className="w-full" onClick={() => openExternalLink(project.appStoreUrl)} icon={ExternalLink}>
+-                View on App Store
++                {projectSheetCopy.ctas.appStore}
+               </LiquidButton>
+             )}
+ 
+@@ -158,24 +178,24 @@ export const ProjectDetailSheet: React.FC<ProjectDetailSheetProps> = ({ project,
+                 <LiquidButton
+                   size="lg"
+                   variant="glass"
+-                  className="flex-1 bg-white border-slate-200"
+-                  onClick={() => openExternalLink(project.webUrl)}
+-                  icon={Globe}
+-                >
+-                  Website
+-                </LiquidButton>
+-              )}
++                className="flex-1 bg-white border-slate-200"
++                onClick={() => openExternalLink(project.webUrl)}
++                icon={Globe}
++              >
++                {projectSheetCopy.ctas.website}
++              </LiquidButton>
++            )}
+               {project.githubUrl && (
+                 <LiquidButton
+                   size="lg"
+                   variant="glass"
+-                  className="flex-1 bg-white border-slate-200"
+-                  onClick={() => openExternalLink(project.githubUrl)}
+-                  icon={Github}
+-                >
+-                  Source Code
+-                </LiquidButton>
+-              )}
++                className="flex-1 bg-white border-slate-200"
++                onClick={() => openExternalLink(project.githubUrl)}
++                icon={Github}
++              >
++                {projectSheetCopy.ctas.sourceCode}
++              </LiquidButton>
++            )}
+             </div>
+           </div>
+         </div>
+diff --git a/site/src/components/sections/About.tsx b/site/src/components/sections/About.tsx
+index 9af15dd..f0f1e3d 100644
+--- a/site/src/components/sections/About.tsx
++++ b/site/src/components/sections/About.tsx
+@@ -1,5 +1,6 @@
+ import React from 'react';
+ import { Github, Mail, Sparkles, Twitter, User } from 'lucide-react';
++import { aboutCopy, sectionCopy } from '@/config/copy';
+ import type { AboutSectionProps } from './types';
+ import { LiquidCard } from '../LiquidCard';
+ import { LiquidSegmentControl } from '../LiquidSegmentControl';
+@@ -57,14 +58,18 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ profile, aboutTab, o
+       <div className="w-full max-w-2xl">
+         <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center justify-center gap-2">
+           <Sparkles size={20} className="text-yellow-500 fill-yellow-500" />
+-          Hello, World!
++          {sectionCopy.about.title}
+         </h3>
+ 
+         <p className="text-slate-600 leading-relaxed text-lg mb-10">
+           {profile.description}
+           <br />
+           <br />
+-          ネイティブアプリの<strong className="text-slate-900">「滑らかさ」</strong>と、Webの<strong className="text-slate-900">「柔軟性」</strong>を組み合わせ、境界のないデジタル体験を作ることに情熱を注いでいます。
++          {aboutCopy.note.prefix}
++          <strong className="text-slate-900">{aboutCopy.note.emphasisA}</strong>
++          {aboutCopy.note.bridge}
++          <strong className="text-slate-900">{aboutCopy.note.emphasisB}</strong>
++          {aboutCopy.note.suffix}
+         </p>
+ 
+         <div className="w-full max-w-sm mx-auto mb-8">
+diff --git a/site/src/components/sections/Hero.tsx b/site/src/components/sections/Hero.tsx
+index 86b5f78..19d21df 100644
+--- a/site/src/components/sections/Hero.tsx
++++ b/site/src/components/sections/Hero.tsx
+@@ -1,6 +1,6 @@
+ import React from 'react';
+ import { Folder, Mail } from 'lucide-react';
+-import { heroCopy } from '@/config/tokens';
++import { heroActionsCopy, heroCopy } from '@/config/copy';
+ import type { HeroSectionProps } from './types';
+ import { LiquidCard } from '../LiquidCard';
+ import { LiquidButton } from '../LiquidButton';
+@@ -31,10 +31,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ profile, onScrollToWor
+ 
+     <div className="flex flex-col sm:flex-row gap-5">
+       <LiquidButton size="lg" onClick={onScrollToWork} icon={Folder} className="shadow-xl shadow-indigo-500/20">
+-        Browse Projects
++        {heroActionsCopy.browseProjects}
+       </LiquidButton>
+       <LiquidButton size="lg" variant="glass" onClick={onContact} icon={Mail}>
+-        Contact Me
++        {heroActionsCopy.contactMe}
+       </LiquidButton>
+     </div>
+   </div>
+diff --git a/site/src/components/sections/Timeline.tsx b/site/src/components/sections/Timeline.tsx
+index fc1ffdc..e8abcc1 100644
+--- a/site/src/components/sections/Timeline.tsx
++++ b/site/src/components/sections/Timeline.tsx
+@@ -1,5 +1,6 @@
+ import React from 'react';
+ import { ArrowUpRight } from 'lucide-react';
++import { sectionCopy } from '@/config/copy';
+ import { SectionHeader } from '../SectionHeader';
+ import type { TimelineSectionProps } from './types';
+ import { LiquidCard } from '../LiquidCard';
+@@ -7,7 +8,7 @@ import { getTimelineProject } from '@/data/timeline';
+ 
+ export const TimelineSection: React.FC<TimelineSectionProps> = ({ items, onSelectProject }) => (
+   <div id="history" className="max-w-4xl mx-auto px-6 py-24">
+-    <SectionHeader title="Journey" align="center" />
++    <SectionHeader title={sectionCopy.timeline.title} align="center" />
+ 
+     <div className="relative space-y-8">
+       <div className="absolute left-[39px] top-8 bottom-8 w-0.5 bg-gradient-to-b from-transparent via-slate-300 to-transparent" />
+diff --git a/site/src/components/sections/Work.tsx b/site/src/components/sections/Work.tsx
+index 3cb045b..f02ba79 100644
+--- a/site/src/components/sections/Work.tsx
++++ b/site/src/components/sections/Work.tsx
+@@ -1,11 +1,12 @@
+ import React from 'react';
++import { sectionCopy } from '@/config/copy';
+ import { SectionHeader } from '../SectionHeader';
+ import { FolderComponent } from '../Folder';
+ import type { WorkSectionProps } from './types';
+ 
+ export const WorkSection: React.FC<WorkSectionProps> = ({ categorizedProjects, categories, onSelectProject }) => (
+   <div id="work" className="max-w-7xl mx-auto px-6 py-24 min-h-screen flex flex-col justify-center">
+-    <SectionHeader title="Work Archives" align="center" />
++    <SectionHeader title={sectionCopy.work.title} align="center" />
+ 
+     <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 justify-items-center">
+       {categories.map((category, index) => {
+@@ -27,7 +28,7 @@ export const WorkSection: React.FC<WorkSectionProps> = ({ categorizedProjects, c
+     </div>
+ 
+     <div className="text-center mt-20 max-w-lg mx-auto text-slate-500 text-sm leading-relaxed">
+-      <p>Tap a folder to explore each project. Select a card to view the details.</p>
++      <p>{sectionCopy.work.helper}</p>
+     </div>
+   </div>
+ );
+diff --git a/site/src/config/tokens.ts b/site/src/config/tokens.ts
+index 9f3e503..706d250 100644
+--- a/site/src/config/tokens.ts
++++ b/site/src/config/tokens.ts
+@@ -5,16 +5,27 @@ export const textures = {
+     'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAAUVBMVEWFhYWDg4N8fHxqeHgAAAB/f393d3eAgICGhQV0dHRlZWWCgoSHh4dxcXFsbGxoaGhzdXVubm5iYmJmZmZxcXFwcHBra2tFRUUwMDAkJCRWVlQW8qjlAAAAAXRSTlMAQObYZgAAAAFiS0dEAIgFHUgAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfmBwYQKCMy24+FAAAApElEQVRIx2NgGAWjYBSMglEwCkgCRiomMNDQyKgIqY6ODqS6u7uTqG8UjIJRMApGwSgYBSMAAxMTM7OQkBBEXmZmFpG6R8EoGAWjYBSMglEwCoYnwMnJycnMzAwmHR0dEXl5eXlE6hsFo2AUjIJRMApGwXABFiYmZmbm5uYg0tLS0hKRuqE4mJmZhYWFhY2NjaG6R8EoGAWjYBSMglEwCkYBSQAAYy8D/b+65MwAAAAASUVORK5CYII=',
+ };
+ 
+-export const heroCopy = {
+-  status: 'Ryo Tsurutani',
+-  leadPrefix: "I'm Ryo Tsurutani — I build",
+-  leadHighlight: 'joyful products',
+-  leadSuffix: ' that connect people.',
+-};
+-
+-export const shareCopy = {
+-  successTitle: 'Check this out',
+-  fallback: 'Shared!',
++export const backgroundTokens = {
++  baseColorClass: 'bg-[#F0F2F5]',
++  gradientClass: 'bg-gradient-to-tr from-[#Eef2f3] via-[#E2E2E2] to-[#C9D6FF]',
++  blobs: [
++    {
++      className:
++        'absolute top-[-20%] left-[-10%] w-[70%] h-[70%] rounded-full bg-gradient-to-r from-cyan-300/30 to-blue-300/30 blur-[120px]',
++      durationSec: 15,
++    },
++    {
++      className:
++        'absolute bottom-[-10%] right-[-20%] w-[60%] h-[60%] rounded-full bg-gradient-to-l from-purple-300/30 to-pink-300/30 blur-[120px]',
++      durationSec: 18,
++    },
++    {
++      className:
++        'absolute top-[30%] right-[20%] w-[40%] h-[40%] rounded-full bg-yellow-200/20 blur-[100px]',
++      durationSec: 20,
++    },
++  ],
++  noiseOpacityClass: 'opacity-[0.04]',
+ };
+ 
+ export const liquidTheme = {
+@@ -62,3 +73,39 @@ export const plateStyle = {
+   borderRadiusPx: 20,
+   perspective: 1000,
+ };
++
++export const folderMotion = {
++  openYOffset: -160,
++  baseSpread: 120,
++  spreadIncrement: 15,
++  maxSpread: 240,
++  maxRotateBase: 10,
++  maxRotateIncrement: 1.5,
++  maxRotateCap: 25,
++  archIntensity: 8,
++  hoverTranslateX: -20,
++  hoverTranslateRange: 40,
++  hoverRotateStart: -5,
++  hoverRotateRange: 10,
++  hoverTranslateY: -60,
++  alignShiftBase: 40,
++  alignShiftScale: 15,
++  alignShiftMax: 160,
++  alignRotateAdjust: 5,
++  openTiltDegrees: -20,
++  closedTranslateZ: 20,
++};
++
++export const folderStyle = {
++  plateColor: '#75BCE6',
++  plateShadow: '0 20px 50px -10px rgba(0,0,0,0.4)',
++  coverShadow: '0 25px 50px -12px rgba(0,0,0,0.3)',
++  plateNoiseClass: 'opacity-30 mix-blend-overlay',
++};
++
++export const sheetMetrics = {
++  dragCloseThreshold: 100,
++  containerHeightClass: 'h-[92vh]',
++  overlayOpacityClass: 'bg-slate-900/20',
++  overlayBlurClass: 'backdrop-blur-[4px]',
++};
+diff --git a/site/src/utils/links.ts b/site/src/utils/links.ts
+index 3deefbf..076dd9b 100644
+--- a/site/src/utils/links.ts
++++ b/site/src/utils/links.ts
+@@ -1,4 +1,4 @@
+-import { shareCopy } from '@/config/tokens';
++import { shareCopy } from '@/config/copy';
+ 
+ export const openExternalLink = (url?: string) => {
+   if (!url || typeof window === 'undefined') return;

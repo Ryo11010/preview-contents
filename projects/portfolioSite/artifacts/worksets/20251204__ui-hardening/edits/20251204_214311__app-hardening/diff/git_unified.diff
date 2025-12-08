@@ -1,0 +1,1271 @@
+diff --git a/app.tsx b/app.tsx
+index 7f440a0..1b6828b 100644
+--- a/app.tsx
++++ b/app.tsx
+@@ -86,6 +86,51 @@ type SegmentOption<T extends string> = {
+   value: T;
+ };
+ 
++type SectionHeaderProps = {
++  icon: IconComponent;
++  title: string;
++  align?: 'left' | 'center';
++};
++
++type HeroSectionProps = {
++  profile: Profile;
++  onScrollToWork: () => void;
++  onContact: () => void;
++};
++
++type WorkSectionProps = {
++  projects: Project[];
++  onSelectProject: (project: Project) => void;
++  onOpenArchive: () => void;
++};
++
++type TimelineSectionProps = {
++  items: TimelineItem[];
++  onSelectProject: (project: Project) => void;
++};
++
++type AboutSectionProps = {
++  profile: Profile;
++  aboutTab: 'skills' | 'interests';
++  options: SegmentOption<'skills' | 'interests'>[];
++  onChangeTab: (tab: 'skills' | 'interests') => void;
++  onContact: () => void;
++};
++
++type ProjectDetailSheetProps = {
++  project: Project | null;
++  onClose: () => void;
++  onShare: () => void;
++  onOpenAppStore: () => void;
++};
++
++type ArchiveSheetProps = {
++  projects: Project[];
++  isOpen: boolean;
++  onSelect: (project: Project) => void;
++  onClose: () => void;
++};
++
+ /* -------------------------------------------------------------------------- */
+ /* CONSTANTS (content & visual tokens)                                       */
+ /* -------------------------------------------------------------------------- */
+@@ -93,6 +138,26 @@ type SegmentOption<T extends string> = {
+ const NOISE_TEXTURE =
+   "data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E";
+ 
++const HERO_COPY = {
++  status: 'AVAILABLE FOR WORK',
++  leadPrefix: 'Engineering interactions that feel',
++  leadHighlight: 'alive',
++  leadSuffix: '.',
++};
++
++const SHARE_COPY = {
++  successTitle: 'Check this out',
++  fallback: 'Shared!',
++};
++
++const APP_STORE_MESSAGE = 'Opening App Store...';
++
++const EXPERIENCE_STAT = {
++  value: '6',
++  suffix: '+',
++  label: 'Years Experience',
++};
++
+ const LiquidTheme = {
+   glass: {
+     base: 'bg-white/40 backdrop-blur-3xl supports-[backdrop-filter]:bg-white/40',
+@@ -250,17 +315,84 @@ const ABOUT_OPTIONS: SegmentOption<'skills' | 'interests'>[] = [
+   { label: 'Personal Interests', value: 'interests' },
+ ];
+ 
++const BUTTON_VARIANTS = {
++  primary:
++    'bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:brightness-110 border border-transparent',
++  danger: 'bg-white/60 text-red-500 hover:bg-red-50 border border-red-100',
++  ghost: 'bg-transparent text-slate-600 hover:bg-white/40 shadow-none',
++  glass:
++    'bg-white/30 backdrop-blur-md border border-white/60 text-slate-700 hover:bg-white/50 hover:border-white/80 shadow-sm',
++  segment: 'bg-white text-blue-600 shadow-[0_0_15px_rgba(59,130,246,0.5)]',
++} as const;
++
++const BUTTON_SIZES = {
++  sm: 'py-2 px-3 text-xs',
++  md: 'py-3.5 px-6 text-sm',
++  lg: 'py-4 px-8 text-base',
++  icon: 'p-3 rounded-2xl',
++} as const;
++
+ /* -------------------------------------------------------------------------- */
+ /* HELPERS                                                                    */
+ /* -------------------------------------------------------------------------- */
+ 
+ const openExternalLink = (url: string) => {
++  if (!url || typeof window === 'undefined') return;
+   window.open(url, '_blank', 'noopener,noreferrer');
+ };
+ 
++const openMailLink = (email: string) => {
++  if (!email || typeof window === 'undefined') return;
++  window.location.href = `mailto:${email}`;
++};
++
++const safeAlert = (message: string) => {
++  if (typeof window === 'undefined') return;
++  window.alert(message);
++};
++
+ const getProjectById = (id: string | null): Project | null =>
+   PROJECTS.find((project) => project.id === id) || null;
+ 
++const shareContent = (text: string) => {
++  if (typeof navigator !== 'undefined' && 'share' in navigator) {
++    const nav = navigator as Navigator & { share?: (data: ShareData) => Promise<void> };
++    if (nav.share) {
++      nav.share({ title: SHARE_COPY.successTitle, text }).catch(() => safeAlert(SHARE_COPY.fallback));
++      return;
++    }
++  }
++  safeAlert(SHARE_COPY.fallback);
++};
++
++const useSectionObserver = (onSectionChange: (id: SectionId) => void) => {
++  useEffect(() => {
++    if (typeof window === 'undefined' || typeof document === 'undefined' || !('IntersectionObserver' in window)) {
++      return;
++    }
++
++    const observer = new IntersectionObserver(
++      (entries) => {
++        entries.forEach((entry) => {
++          if (entry.isIntersecting) {
++            onSectionChange(entry.target.id as SectionId);
++          }
++        });
++      },
++      { threshold: 0.3 }
++    );
++
++    SECTION_IDS.forEach((id) => {
++      const el = document.getElementById(id);
++      if (el) {
++        observer.observe(el);
++      }
++    });
++
++    return () => observer.disconnect();
++  }, [onSectionChange]);
++};
++
+ /* -------------------------------------------------------------------------- */
+ /* PRESENTATION COMPONENTS                                                   */
+ /* -------------------------------------------------------------------------- */
+@@ -278,9 +410,7 @@ const LiquidContainer: React.FC<LiquidContainerProps> = ({
+   backgroundClassName = '',
+   showNoise = true,
+ }) => (
+-  <div
+-    className={`relative min-h-screen w-full overflow-hidden font-sans text-slate-900 bg-[#F0F2F5] ${className}`}
+-  >
++  <div className={`relative min-h-screen w-full overflow-hidden font-sans text-slate-900 bg-[#F0F2F5] ${className}`}>
+     <div className={`fixed inset-0 z-0 pointer-events-none ${backgroundClassName}`}>
+       <div className="absolute inset-0 bg-gradient-to-tr from-[#Eef2f3] via-[#E2E2E2] to-[#C9D6FF]" />
+       <div
+@@ -296,10 +426,7 @@ const LiquidContainer: React.FC<LiquidContainerProps> = ({
+         style={{ animationDuration: '20s' }}
+       />
+       {showNoise && (
+-        <div
+-          className="absolute inset-0 opacity-[0.04] mix-blend-overlay"
+-          style={{ backgroundImage: `url("${NOISE_TEXTURE}")` }}
+-        />
++        <div className="absolute inset-0 opacity-[0.04] mix-blend-overlay" style={{ backgroundImage: `url("${NOISE_TEXTURE}")` }} />
+       )}
+     </div>
+     <div className="relative z-10 h-full">{children}</div>
+@@ -346,7 +473,6 @@ const LiquidCard: React.FC<LiquidCardProps> = ({
+     {!transparent && glassEffect && (
+       <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-transparent opacity-50 pointer-events-none" />
+     )}
+-    {/* Added w-full to ensure inner content takes full width for flexbox layouts */}
+     <div className="relative z-10 h-full w-full">{children}</div>
+   </div>
+ );
+@@ -354,8 +480,8 @@ const LiquidCard: React.FC<LiquidCardProps> = ({
+ type LiquidButtonProps = {
+   children?: React.ReactNode;
+   onClick?: () => void;
+-  variant?: 'primary' | 'danger' | 'ghost' | 'glass' | 'segment';
+-  size?: 'sm' | 'md' | 'lg' | 'icon';
++  variant?: keyof typeof BUTTON_VARIANTS;
++  size?: keyof typeof BUTTON_SIZES;
+   className?: string;
+   icon?: IconComponent;
+   disabled?: boolean;
+@@ -376,27 +502,10 @@ const LiquidButton: React.FC<LiquidButtonProps> = ({
+   const baseStyles =
+     'flex items-center justify-center font-bold rounded-2xl transition-all active:scale-95 shadow-sm relative overflow-hidden group';
+ 
+-  const variants = {
+-    primary:
+-      'bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:brightness-110 border border-transparent',
+-    danger: 'bg-white/60 text-red-500 hover:bg-red-50 border border-red-100',
+-    ghost: 'bg-transparent text-slate-600 hover:bg-white/40 shadow-none',
+-    glass:
+-      'bg-white/30 backdrop-blur-md border border-white/60 text-slate-700 hover:bg-white/50 hover:border-white/80 shadow-sm',
+-    segment: 'bg-white text-blue-600 shadow-[0_0_15px_rgba(59,130,246,0.5)]',
+-  };
+-
+-  const sizes = {
+-    sm: 'py-2 px-3 text-xs',
+-    md: 'py-3.5 px-6 text-sm',
+-    lg: 'py-4 px-8 text-base',
+-    icon: 'p-3 rounded-2xl',
+-  };
+-
+   const buttonClass = [
+     baseStyles,
+-    variants[variant] || variants.glass,
+-    sizes[size] || sizes.md,
++    BUTTON_VARIANTS[variant] || BUTTON_VARIANTS.glass,
++    BUTTON_SIZES[size] || BUTTON_SIZES.md,
+     disabled ? 'opacity-50 cursor-not-allowed' : '',
+     className,
+   ].join(' ');
+@@ -420,11 +529,7 @@ type LiquidSegmentControlProps<T extends string> = {
+   onChange: (value: T) => void;
+ };
+ 
+-const LiquidSegmentControl = <T extends string>({
+-  options,
+-  value,
+-  onChange,
+-}: LiquidSegmentControlProps<T>) => {
++const LiquidSegmentControl = <T extends string>({ options, value, onChange }: LiquidSegmentControlProps<T>) => {
+   const activeIndex = options.findIndex((option) => option.value === value);
+   const safeIndex = activeIndex >= 0 ? activeIndex : 0;
+ 
+@@ -600,472 +705,513 @@ const LiquidDock: React.FC<LiquidDockProps> = ({ tabs, activeId, onChange }) =>
+   );
+ };
+ 
++const SectionHeader: React.FC<SectionHeaderProps> = ({ icon: Icon, title, align = 'left' }) => (
++  <div
++    className={`flex items-center gap-4 mb-12 pl-2 ${
++      align === 'center' ? 'justify-center' : ''
++    }`}
++  >
++    <div className="p-3 bg-white/80 rounded-2xl shadow-sm border border-white/50 text-indigo-600">
++      <Icon size={28} />
++    </div>
++    <h2 className="text-4xl font-bold text-slate-800 tracking-tight">{title}</h2>
++  </div>
++);
++
+ /* -------------------------------------------------------------------------- */
+-/* APP                                                                        */
++/* SECTIONS                                                                  */
+ /* -------------------------------------------------------------------------- */
+ 
+-export default function App() {
+-  const [activeSection, setActiveSection] = useState<SectionId>('hero');
+-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+-  const [showArchive, setShowArchive] = useState(false);
+-  const [aboutTab, setAboutTab] = useState<'skills' | 'interests'>('skills');
++const HeroSection: React.FC<HeroSectionProps> = ({ profile, onScrollToWork, onContact }) => (
++  <div id="hero" className="min-h-screen flex flex-col items-center justify-center p-6 text-center pt-20 pb-32">
++    <div className="mb-10 animate-[fade-in-up_1s_ease-out]">
++      <LiquidCard
++        padding="px-5 py-2.5"
++        className="inline-flex items-center gap-3 !rounded-full bg-white/60 border border-white/60 shadow-sm backdrop-blur-md"
++      >
++        <span className="relative flex h-3 w-3">
++          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
++          <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
++        </span>
++        <span className="text-xs font-bold text-slate-600 tracking-wider">{HERO_COPY.status}</span>
++      </LiquidCard>
++    </div>
+ 
+-  const dockTabs = useMemo(() => DOCK_TABS, []);
+-  const aboutOptions = useMemo(() => ABOUT_OPTIONS, []);
++    <h1 className="text-7xl md:text-[100px] font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-slate-900 via-slate-700 to-slate-500 pb-4 mb-4 leading-[0.9]">
++      {profile.catchphrase}
++    </h1>
++
++    <p className="text-xl md:text-3xl text-slate-600 font-medium max-w-3xl mx-auto mb-12 leading-relaxed">
++      {HERO_COPY.leadPrefix}{' '}
++      <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 font-bold">
++        {HERO_COPY.leadHighlight}
++      </span>
++      {HERO_COPY.leadSuffix}
++    </p>
++
++    <div className="flex flex-col sm:flex-row gap-5">
++      <LiquidButton size="lg" onClick={onScrollToWork} icon={ArrowUpRight} className="shadow-xl shadow-indigo-500/20">
++        Explore Work
++      </LiquidButton>
++      <LiquidButton size="lg" variant="glass" onClick={onContact} icon={Mail}>
++        Contact Me
++      </LiquidButton>
++    </div>
++  </div>
++);
+ 
+-  const scrollTo = useCallback((id: SectionId) => {
+-    setActiveSection(id);
+-    const el = document.getElementById(id);
+-    if (el) {
+-      el.scrollIntoView({ behavior: 'smooth' });
+-    }
+-  }, []);
++const ProjectHighlightCard: React.FC<{ project: Project; onClick: () => void }> = ({ project, onClick }) => (
++  <LiquidCard
++    onClick={onClick}
++    className="md:col-span-4 min-h-[460px] group flex flex-col relative !overflow-visible"
++    glassEffect={false}
++  >
++    <div
++      className={`absolute inset-0 bg-gradient-to-br ${project.color} opacity-[0.08] group-hover:opacity-[0.15] transition-opacity duration-700 rounded-[36px]`}
++    />
++
++    <div className="relative z-10 flex flex-col h-full p-2">
++      <div className="flex justify-between items-start mb-6">
++        <span className="px-4 py-1.5 bg-white/80 backdrop-blur-md rounded-full text-xs font-bold uppercase text-slate-700 shadow-sm border border-white/50">
++          Featured
++        </span>
++        <div className="w-12 h-12 rounded-full bg-white/50 flex items-center justify-center group-hover:bg-white transition-colors duration-300">
++          <ArrowUpRight className="text-slate-400 group-hover:text-slate-900" />
++        </div>
++      </div>
+ 
+-  useEffect(() => {
+-    const observer = new IntersectionObserver(
+-      (entries) => {
+-        entries.forEach((entry) => {
+-          if (entry.isIntersecting) {
+-            setActiveSection(entry.target.id as SectionId);
+-          }
+-        });
+-      },
+-      { threshold: 0.3 }
+-    );
+-    SECTION_IDS.forEach((id) => {
+-      const el = document.getElementById(id);
+-      if (el) {
+-        observer.observe(el);
+-      }
+-    });
+-    return () => observer.disconnect();
+-  }, []);
++      <div className="px-4">
++        <h3 className="text-5xl md:text-6xl font-black text-slate-900 mb-3 tracking-tight group-hover:translate-x-1 transition-transform duration-500">
++          {project.title}
++        </h3>
++        <p className="text-xl text-slate-600 font-medium max-w-md leading-relaxed">{project.tagline}</p>
++      </div>
+ 
+-  const handleContact = useCallback(() => {
+-    window.location.href = `mailto:${PROFILE.email}`;
+-  }, []);
++      <div className="mt-auto self-end w-[85%] h-56 bg-gradient-to-t from-white/90 to-white/40 border-t border-l border-white/60 rounded-tl-[40px] shadow-2xl flex items-center justify-center translate-y-8 translate-x-8 group-hover:translate-x-4 group-hover:translate-y-4 transition-transform duration-700 backdrop-blur-md">
++        <div className="text-center opacity-50">
++          <Smartphone size={64} className="mx-auto mb-2 text-indigo-900" />
++          <span className="text-xs font-bold uppercase tracking-widest text-indigo-900">App Preview</span>
++        </div>
++      </div>
++    </div>
++  </LiquidCard>
++);
+ 
+-  const handleShare = useCallback(() => {
+-    alert('Shared!');
+-  }, []);
++const ProjectSummaryCard: React.FC<{ project: Project; onClick: () => void }> = ({ project, onClick }) => (
++  <LiquidCard
++    onClick={onClick}
++    className="md:col-span-3 min-h-[240px] group flex items-center justify-between relative !overflow-visible"
++    glassEffect={false}
++  >
++    <div
++      className={`absolute inset-0 bg-gradient-to-r ${project.color} opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-500 rounded-[36px]`}
++    />
++    <div className="relative z-10 max-w-[60%] p-2">
++      <span className={`inline-block px-3 py-1 rounded-lg text-[10px] font-bold uppercase mb-3 tracking-wide ${project.accent}`}>
++        {project.category}
++      </span>
++      <h3 className="text-3xl font-black text-slate-900 mb-2 leading-tight">{project.title}</h3>
++      <p className="text-sm text-slate-500 line-clamp-2 font-medium">{project.tagline}</p>
++    </div>
++    <div className="relative z-10 w-20 h-20 rounded-[24px] bg-white shadow-lg border border-white/50 flex items-center justify-center group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500">
++      {project.id === 'proj-2' ? <Layers size={32} className="text-purple-500" /> : <Cpu size={32} className="text-teal-500" />}
++    </div>
++  </LiquidCard>
++);
+ 
+-  const handleOpenAppStore = useCallback(() => {
+-    alert('Opening App Store...');
+-  }, []);
++const WorkArchiveCard: React.FC<{ onClick: () => void }> = ({ onClick }) => (
++  <LiquidCard
++    onClick={onClick}
++    className="md:col-span-6 group relative overflow-hidden !bg-white/70 hover:!bg-white/90 border border-white/60 transition-all duration-300"
++    padding="p-6"
++  >
++    <div className="flex items-center justify-between w-full">
++      <div className="flex items-center gap-5">
++        <div className="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-sm">
++          <List size={26} />
++        </div>
++        <div>
++          <h3 className="text-xl font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">View All Projects Archive</h3>
++          <p className="text-slate-500 text-sm font-medium mt-0.5">Explore experimental prototypes & concepts</p>
++        </div>
++      </div>
+ 
+-  const handleSelectProject = useCallback((project: Project | null) => {
+-    setSelectedProject(project);
+-  }, []);
++      <div className="w-10 h-10 rounded-full border border-slate-200 bg-white text-slate-400 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-600 transition-all duration-300 shadow-sm">
++        <ChevronRight size={20} />
++      </div>
++    </div>
++  </LiquidCard>
++);
+ 
+-  const handleOpenArchive = useCallback(() => setShowArchive(true), []);
+-  const handleCloseArchive = useCallback(() => setShowArchive(false), []);
++const ExperienceCard: React.FC = () => (
++  <LiquidCard className="md:col-span-2 flex flex-col justify-center items-center text-center bg-white/60 backdrop-blur-xl border border-white/60">
++    <div className="w-20 h-20 rounded-[30px] bg-indigo-50 flex items-center justify-center mb-6 text-indigo-600 rotate-3 shadow-inner">
++      <Activity size={36} />
++    </div>
++    <div className="text-6xl font-black text-slate-900 tracking-tighter mb-2">
++      {EXPERIENCE_STAT.value}
++      <span className="text-indigo-500 text-4xl">{EXPERIENCE_STAT.suffix}</span>
++    </div>
++    <div className="text-sm font-bold text-slate-400 uppercase tracking-widest">{EXPERIENCE_STAT.label}</div>
++  </LiquidCard>
++);
++
++const WorkSection: React.FC<WorkSectionProps> = ({ projects, onSelectProject, onOpenArchive }) => {
++  if (projects.length === 0) return null;
++
++  const [featured, ...rest] = projects;
++  const secondaryProjects = rest.slice(0, 2);
+ 
+   return (
+-    <LiquidContainer>
+-      {/* --- HERO SECTION --- */}
+-      <div id="hero" className="min-h-screen flex flex-col items-center justify-center p-6 text-center pt-20 pb-32">
+-        <div className="mb-10 animate-[fade-in-up_1s_ease-out]">
+-          <LiquidCard
+-            padding="px-5 py-2.5"
+-            className="inline-flex items-center gap-3 !rounded-full bg-white/60 border border-white/60 shadow-sm backdrop-blur-md"
+-          >
+-            <span className="relative flex h-3 w-3">
+-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+-              <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
+-            </span>
+-            <span className="text-xs font-bold text-slate-600 tracking-wider">AVAILABLE FOR WORK</span>
+-          </LiquidCard>
+-        </div>
++    <div id="work" className="max-w-6xl mx-auto px-6 py-24">
++      <SectionHeader icon={Layers} title="Selected Works" />
+ 
+-        <h1 className="text-7xl md:text-[100px] font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-slate-900 via-slate-700 to-slate-500 pb-4 mb-4 leading-[0.9]">
+-          {PROFILE.catchphrase}
+-        </h1>
++      <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
++        <ProjectHighlightCard project={featured} onClick={() => onSelectProject(featured)} />
++        <ExperienceCard />
+ 
+-        <p className="text-xl md:text-3xl text-slate-600 font-medium max-w-3xl mx-auto mb-12 leading-relaxed">
+-          Engineering interactions that feel{' '}
+-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 font-bold">
+-            alive
+-          </span>
+-          .
+-        </p>
++        {secondaryProjects.map((project) => (
++          <ProjectSummaryCard key={project.id} project={project} onClick={() => onSelectProject(project)} />
++        ))}
+ 
+-        <div className="flex flex-col sm:flex-row gap-5">
+-          <LiquidButton size="lg" onClick={() => scrollTo('work')} icon={ArrowUpRight} className="shadow-xl shadow-indigo-500/20">
+-            Explore Work
+-          </LiquidButton>
+-          <LiquidButton size="lg" variant="glass" onClick={handleContact} icon={Mail}>
+-            Contact Me
+-          </LiquidButton>
+-        </div>
++        <WorkArchiveCard onClick={onOpenArchive} />
+       </div>
++    </div>
++  );
++};
+ 
+-      {/* --- WORK SECTION (Bento) --- */}
+-      <div id="work" className="max-w-6xl mx-auto px-6 py-24">
+-        <div className="flex items-center gap-4 mb-12 pl-2">
+-          <div className="p-3 bg-white/80 rounded-2xl shadow-sm border border-white/50 text-indigo-600">
+-            <Layers size={28} />
+-          </div>
+-          <h2 className="text-4xl font-bold text-slate-800 tracking-tight">Selected Works</h2>
+-        </div>
+-
+-        <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
+-          <LiquidCard
+-            onClick={() => handleSelectProject(PROJECTS[0])}
+-            className="md:col-span-4 min-h-[460px] group flex flex-col relative !overflow-visible"
+-            glassEffect={false}
+-          >
+-            <div
+-              className={`absolute inset-0 bg-gradient-to-br ${PROJECTS[0].color} opacity-[0.08] group-hover:opacity-[0.15] transition-opacity duration-700 rounded-[36px]`}
+-            />
+-
+-            <div className="relative z-10 flex flex-col h-full p-2">
+-              <div className="flex justify-between items-start mb-6">
+-                <span className="px-4 py-1.5 bg-white/80 backdrop-blur-md rounded-full text-xs font-bold uppercase text-slate-700 shadow-sm border border-white/50">
+-                  Featured
+-                </span>
+-                <div className="w-12 h-12 rounded-full bg-white/50 flex items-center justify-center group-hover:bg-white transition-colors duration-300">
+-                  <ArrowUpRight className="text-slate-400 group-hover:text-slate-900" />
+-                </div>
+-              </div>
++const TimelineSection: React.FC<TimelineSectionProps> = ({ items, onSelectProject }) => (
++  <div id="history" className="max-w-4xl mx-auto px-6 py-24">
++    <SectionHeader icon={History} title="Journey" align="center" />
+ 
+-              <div className="px-4">
+-                <h3 className="text-5xl md:text-6xl font-black text-slate-900 mb-3 tracking-tight group-hover:translate-x-1 transition-transform duration-500">
+-                  {PROJECTS[0].title}
+-                </h3>
+-                <p className="text-xl text-slate-600 font-medium max-w-md leading-relaxed">{PROJECTS[0].tagline}</p>
+-              </div>
++    <div className="relative space-y-8">
++      <div className="absolute left-[39px] top-8 bottom-8 w-0.5 bg-gradient-to-b from-transparent via-slate-300 to-transparent" />
+ 
+-              <div className="mt-auto self-end w-[85%] h-56 bg-gradient-to-t from-white/90 to-white/40 border-t border-l border-white/60 rounded-tl-[40px] shadow-2xl flex items-center justify-center translate-y-8 translate-x-8 group-hover:translate-x-4 group-hover:translate-y-4 transition-transform duration-700 backdrop-blur-md">
+-                <div className="text-center opacity-50">
+-                  <Smartphone size={64} className="mx-auto mb-2 text-indigo-900" />
+-                  <span className="text-xs font-bold uppercase tracking-widest text-indigo-900">App Preview</span>
+-                </div>
++      {items.map((item, index) => {
++        const Icon = item.icon;
++        const project = item.projectId ? getProjectById(item.projectId) : null;
++        return (
++          <div key={`${item.title}-${index}`} className="relative pl-28 group">
++            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-20 h-20 flex items-center justify-center">
++              <div
++                className={`w-14 h-14 rounded-2xl flex items-center justify-center border-4 border-[#F0F2F5] z-10 bg-white shadow-sm transition-all duration-500 ${
++                  item.projectId ? 'group-hover:scale-110 group-hover:rotate-3' : 'opacity-80'
++                }`}
++              >
++                <Icon size={24} className={item.color} />
+               </div>
+             </div>
+-          </LiquidCard>
+-
+-          <LiquidCard className="md:col-span-2 flex flex-col justify-center items-center text-center bg-white/60 backdrop-blur-xl border border-white/60">
+-            <div className="w-20 h-20 rounded-[30px] bg-indigo-50 flex items-center justify-center mb-6 text-indigo-600 rotate-3 shadow-inner">
+-              <Activity size={36} />
+-            </div>
+-            <div className="text-6xl font-black text-slate-900 tracking-tighter mb-2">
+-              6<span className="text-indigo-500 text-4xl">+</span>
+-            </div>
+-            <div className="text-sm font-bold text-slate-400 uppercase tracking-widest">Years Experience</div>
+-          </LiquidCard>
+ 
+-          {PROJECTS.slice(1, 3).map((project) => (
+             <LiquidCard
+-              key={project.id}
+-              onClick={() => handleSelectProject(project)}
+-              className="md:col-span-3 min-h-[240px] group flex items-center justify-between relative !overflow-visible"
+-              glassEffect={false}
++              onClick={() => project && onSelectProject(project)}
++              className={`${project ? 'hover:scale-[1.01]' : 'cursor-default opacity-90'} transition-all`}
++              padding="p-6 md:p-8"
+             >
+-              <div
+-                className={`absolute inset-0 bg-gradient-to-r ${project.color} opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-500 rounded-[36px]`}
+-              />
+-              <div className="relative z-10 max-w-[60%] p-2">
+-                <span className={`inline-block px-3 py-1 rounded-lg text-[10px] font-bold uppercase mb-3 tracking-wide ${project.accent}`}>
+-                  {project.category}
+-                </span>
+-                <h3 className="text-3xl font-black text-slate-900 mb-2 leading-tight">{project.title}</h3>
+-                <p className="text-sm text-slate-500 line-clamp-2 font-medium">{project.tagline}</p>
+-              </div>
+-              <div className="relative z-10 w-20 h-20 rounded-[24px] bg-white shadow-lg border border-white/50 flex items-center justify-center group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500">
+-                {project.id === 'proj-2' ? <Layers size={32} className="text-purple-500" /> : <Cpu size={32} className="text-teal-500" />}
++              <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2 mb-2">
++                <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
++                  {item.title}
++                  {project && (
++                    <ArrowUpRight size={16} className="text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity" />
++                  )}
++                </h3>
++                <span className="text-xs font-bold text-slate-400 bg-slate-100 px-3 py-1 rounded-full w-fit">{item.year}</span>
+               </div>
++              <p className="text-slate-600 leading-relaxed">{item.desc}</p>
+             </LiquidCard>
+-          ))}
++          </div>
++        );
++      })}
++    </div>
++  </div>
++);
+ 
+-          <LiquidCard
+-            onClick={handleOpenArchive}
+-            className="md:col-span-6 group relative overflow-hidden !bg-white/70 hover:!bg-white/90 border border-white/60 transition-all duration-300"
+-            padding="p-6"
+-          >
+-            <div className="flex items-center justify-between w-full">
+-              <div className="flex items-center gap-5">
+-                <div className="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-sm">
+-                  <List size={26} />
+-                </div>
+-                <div>
+-                  <h3 className="text-xl font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">
+-                    View All Projects Archive
+-                  </h3>
+-                  <p className="text-slate-500 text-sm font-medium mt-0.5">
+-                    Explore experimental prototypes & concepts
+-                  </p>
++const AboutSection: React.FC<AboutSectionProps> = ({ profile, aboutTab, options, onChangeTab, onContact }) => (
++  <div id="about" className="max-w-4xl mx-auto px-6 py-24 pb-48">
++    <LiquidCard padding="p-12" className="flex flex-col items-center bg-white/80 text-center">
++      <div className="flex flex-col items-center mb-10 w-full">
++        <div className="w-40 h-40 rounded-[48px] bg-gradient-to-tr from-indigo-100 via-purple-100 to-blue-100 p-2 shadow-2xl mb-6 hover:rotate-3 transition-transform duration-500">
++          <div className="w-full h-full rounded-[40px] bg-white flex items-center justify-center overflow-hidden relative">
++            <User size={64} className="text-slate-300" />
++            <div className="absolute bottom-4 right-4 w-5 h-5 bg-green-500 border-[3px] border-white rounded-full" />
++          </div>
++        </div>
++
++        <h2 className="text-3xl font-black text-slate-900 mb-3">{profile.name}</h2>
++        <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 font-bold text-sm mb-6">
++          {profile.role}
++        </div>
++
++        <div className="flex gap-3">
++          <LiquidButton
++            size="icon"
++            variant="glass"
++            onClick={() => openExternalLink(profile.socials.twitter)}
++            icon={Twitter}
++            className="hover:text-[#1DA1F2] bg-white border-slate-200"
++          />
++          <LiquidButton
++            size="icon"
++            variant="glass"
++            onClick={() => openExternalLink(profile.socials.github)}
++            icon={Github}
++            className="hover:text-black bg-white border-slate-200"
++          />
++          <LiquidButton
++            size="icon"
++            variant="glass"
++            onClick={onContact}
++            icon={Mail}
++            className="hover:text-red-500 bg-white border-slate-200"
++          />
++        </div>
++      </div>
++
++      <div className="w-16 h-1 bg-slate-100 rounded-full mb-10" />
++
++      <div className="w-full max-w-2xl">
++        <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center justify-center gap-2">
++          <Sparkles size={20} className="text-yellow-500 fill-yellow-500" />
++          Hello, World!
++        </h3>
++
++        <p className="text-slate-600 leading-relaxed text-lg mb-10">
++          {profile.description}
++          <br />
++          <br />
++          ネイティブアプリの<strong className="text-slate-900">「滑らかさ」</strong>と、Webの
++          <strong className="text-slate-900">「柔軟性」</strong>を組み合わせ、境界のないデジタル体験を作ることに情熱を注いでいます。
++        </p>
++
++        <div className="w-full max-w-sm mx-auto mb-8">
++          <LiquidSegmentControl options={options} value={aboutTab} onChange={onChangeTab} />
++        </div>
++
++        <div className="min-h-[140px] flex justify-center">
++          {aboutTab === 'skills' ? (
++            <div className="flex flex-wrap justify-center gap-2.5 animate-in fade-in slide-in-from-bottom-2 duration-300">
++              {profile.skills.map((skill) => (
++                <span
++                  key={skill}
++                  className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-600 shadow-sm hover:border-indigo-200 hover:text-indigo-600 transition-colors cursor-default"
++                >
++                  {skill}
++                </span>
++              ))}
++            </div>
++          ) : (
++            <div className="flex flex-wrap justify-center gap-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
++              {profile.interests.map((item) => (
++                <div
++                  key={item.label}
++                  className={`flex items-center gap-3 px-5 py-3 rounded-2xl text-sm font-bold shadow-sm border border-transparent hover:scale-105 transition-transform duration-300 cursor-default ${item.color}`}
++                >
++                  <item.icon size={18} /> {item.label}
+                 </div>
+-              </div>
+-              
+-              <div className="w-10 h-10 rounded-full border border-slate-200 bg-white text-slate-400 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-600 transition-all duration-300 shadow-sm">
+-                <ChevronRight size={20} />
+-              </div>
++              ))}
+             </div>
+-          </LiquidCard>
++          )}
+         </div>
+       </div>
++    </LiquidCard>
++  </div>
++);
+ 
+-      {/* --- TIMELINE SECTION --- */}
+-      <div id="history" className="max-w-4xl mx-auto px-6 py-24">
+-        <div className="flex items-center gap-4 mb-16 pl-2 justify-center">
+-          <div className="p-3 bg-white/80 rounded-2xl shadow-sm border border-white/50 text-indigo-600">
+-            <History size={28} />
++const ProjectDetailSheet: React.FC<ProjectDetailSheetProps> = ({ project, onClose, onShare, onOpenAppStore }) => (
++  <LiquidSheet
++    isOpen={!!project}
++    onClose={onClose}
++    title={project?.category || 'Project'}
++    headerRight={<LiquidButton size="sm" variant="ghost" icon={Share} onClick={onShare} />}
++  >
++    {project && (
++      <div className="pb-10">
++        <div
++          className={`h-72 w-full bg-gradient-to-br ${project.color} rounded-[32px] mb-8 flex items-center justify-center shadow-lg relative overflow-hidden`}
++        >
++          <div className="absolute inset-0 opacity-20 mix-blend-overlay" style={{ backgroundImage: `url("${NOISE_TEXTURE}")` }} />
++          <div className="w-full h-full flex items-center justify-center scale-90 opacity-90">
++            <Smartphone size={100} className="text-white drop-shadow-2xl" />
+           </div>
+-          <h2 className="text-4xl font-bold text-slate-800 tracking-tight">Journey</h2>
+         </div>
+ 
+-        <div className="relative space-y-8">
+-          <div className="absolute left-[39px] top-8 bottom-8 w-0.5 bg-gradient-to-b from-transparent via-slate-300 to-transparent" />
+-
+-          {TIMELINE_DATA.map((item, index) => {
+-            const Icon = item.icon;
+-            return (
+-              <div key={`${item.title}-${index}`} className="relative pl-28 group">
+-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-20 h-20 flex items-center justify-center">
+-                  <div
+-                    className={`w-14 h-14 rounded-2xl flex items-center justify-center border-4 border-[#F0F2F5] z-10 bg-white shadow-sm transition-all duration-500 ${
+-                      item.projectId ? 'group-hover:scale-110 group-hover:rotate-3' : 'opacity-80'
+-                    }`}
+-                  >
+-                    <Icon size={24} className={item.color} />
+-                  </div>
+-                </div>
++        <div className="space-y-8">
++          <div>
++            <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-3 tracking-tight">{project.title}</h2>
++            <p className="text-2xl text-slate-500 font-medium leading-snug">{project.tagline}</p>
++          </div>
+ 
+-                <LiquidCard
+-                  onClick={() => item.projectId && handleSelectProject(getProjectById(item.projectId))}
+-                  className={`${item.projectId ? 'hover:scale-[1.01]' : 'cursor-default opacity-90'} transition-all`}
+-                  padding="p-6 md:p-8"
+-                >
+-                  <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2 mb-2">
+-                    <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+-                      {item.title}
+-                      {item.projectId && (
+-                        <ArrowUpRight size={16} className="text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity" />
+-                      )}
+-                    </h3>
+-                    <span className="text-xs font-bold text-slate-400 bg-slate-100 px-3 py-1 rounded-full w-fit">
+-                      {item.year}
+-                    </span>
+-                  </div>
+-                  <p className="text-slate-600 leading-relaxed">{item.desc}</p>
+-                </LiquidCard>
+-              </div>
+-            );
+-          })}
+-        </div>
+-      </div>
++          <div className="flex flex-wrap gap-2">
++            {project.techStack.map((tech) => (
++              <span
++                key={tech}
++                className="px-3.5 py-1.5 bg-slate-100 rounded-lg text-xs font-bold text-slate-600 border border-slate-200 uppercase tracking-wide"
++              >
++                {tech}
++              </span>
++            ))}
++          </div>
+ 
+-      {/* --- ABOUT SECTION --- */}
+-      <div id="about" className="max-w-4xl mx-auto px-6 py-24 pb-48">
+-        <LiquidCard padding="p-12" className="flex flex-col items-center bg-white/80 text-center">
+-          
+-          {/* 1. Profile Header (Centered) */}
+-          <div className="flex flex-col items-center mb-10 w-full">
+-            {/* Avatar Container */}
+-            <div className="w-40 h-40 rounded-[48px] bg-gradient-to-tr from-indigo-100 via-purple-100 to-blue-100 p-2 shadow-2xl mb-6 hover:rotate-3 transition-transform duration-500">
+-              <div className="w-full h-full rounded-[40px] bg-white flex items-center justify-center overflow-hidden relative">
+-                <User size={64} className="text-slate-300" />
+-                <div className="absolute bottom-4 right-4 w-5 h-5 bg-green-500 border-[3px] border-white rounded-full" />
++          <LiquidCard padding="p-8" transparent className="bg-slate-50/80 border-slate-100">
++            <div className="grid grid-cols-2 gap-8 mb-6 pb-6 border-b border-slate-200">
++              <div>
++                <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Year</div>
++                <div className="text-lg font-black text-slate-900">{project.year}</div>
++              </div>
++              <div>
++                <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Role</div>
++                <div className="text-lg font-black text-slate-900">{project.role}</div>
+               </div>
+             </div>
+-            
+-            {/* Name & Role */}
+-            <h2 className="text-3xl font-black text-slate-900 mb-3">{PROFILE.name}</h2>
+-            <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 font-bold text-sm mb-6">
+-              {PROFILE.role}
+-            </div>
++            <p className="text-slate-700 leading-relaxed text-lg">{project.description}</p>
++          </LiquidCard>
+ 
+-            {/* Social Links */}
+-            <div className="flex gap-3">
+-              <LiquidButton
+-                size="icon"
+-                variant="glass"
+-                onClick={() => openExternalLink(PROFILE.socials.twitter)}
+-                icon={Twitter}
+-                className="hover:text-[#1DA1F2] bg-white border-slate-200"
+-              />
+-              <LiquidButton
+-                size="icon"
+-                variant="glass"
+-                onClick={() => openExternalLink(PROFILE.socials.github)}
+-                icon={Github}
+-                className="hover:text-black bg-white border-slate-200"
+-              />
+-              <LiquidButton
+-                size="icon"
+-                variant="glass"
+-                onClick={handleContact}
+-                icon={Mail}
+-                className="hover:text-red-500 bg-white border-slate-200"
+-              />
+-            </div>
++          <div className="pt-4">
++            <LiquidButton size="lg" className="w-full" onClick={onOpenAppStore} icon={ExternalLink}>
++              View on App Store
++            </LiquidButton>
+           </div>
++        </div>
++      </div>
++    )}
++  </LiquidSheet>
++);
+ 
+-          {/* 2. Divider */}
+-          <div className="w-16 h-1 bg-slate-100 rounded-full mb-10" />
+-
+-          {/* 3. Bio & Skills (Centered Layout) */}
+-          <div className="w-full max-w-2xl">
+-            <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center justify-center gap-2">
+-              <Sparkles size={20} className="text-yellow-500 fill-yellow-500" />
+-              Hello, World!
+-            </h3>
+-            
+-            <p className="text-slate-600 leading-relaxed text-lg mb-10">
+-              {PROFILE.description}
+-              <br />
+-              <br />
+-              ネイティブアプリの<strong className="text-slate-900">「滑らかさ」</strong>と、Webの
+-              <strong className="text-slate-900">「柔軟性」</strong>を組み合わせ、境界のないデジタル体験を作ることに情熱を注いでいます。
+-            </p>
+-
+-            <div className="w-full max-w-sm mx-auto mb-8">
+-              <LiquidSegmentControl options={aboutOptions} value={aboutTab} onChange={setAboutTab} />
+-            </div>
+-
+-            <div className="min-h-[140px] flex justify-center">
+-              {aboutTab === 'skills' ? (
+-                <div className="flex flex-wrap justify-center gap-2.5 animate-in fade-in slide-in-from-bottom-2 duration-300">
+-                  {PROFILE.skills.map((skill) => (
+-                    <span
+-                      key={skill}
+-                      className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-600 shadow-sm hover:border-indigo-200 hover:text-indigo-600 transition-colors cursor-default"
+-                    >
+-                      {skill}
+-                    </span>
+-                  ))}
+-                </div>
+-              ) : (
+-                <div className="flex flex-wrap justify-center gap-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
+-                  {PROFILE.interests.map((item) => (
+-                    <div
+-                      key={item.label}
+-                      className={`flex items-center gap-3 px-5 py-3 rounded-2xl text-sm font-bold shadow-sm border border-transparent hover:scale-105 transition-transform duration-300 cursor-default ${item.color}`}
+-                    >
+-                      <item.icon size={18} /> {item.label}
+-                    </div>
+-                  ))}
+-                </div>
+-              )}
++const ArchiveSheet: React.FC<ArchiveSheetProps> = ({ projects, isOpen, onSelect, onClose }) => (
++  <LiquidSheet isOpen={isOpen} onClose={onClose} title="All Projects Archive">
++    <div className="space-y-4 pt-2">
++      {projects.map((project) => (
++        <LiquidCard
++          key={project.id}
++          onClick={() => {
++            onSelect(project);
++          }}
++          className="flex items-center gap-5 hover:bg-slate-50 transition-colors cursor-pointer group"
++          padding="p-5"
++          transparent
++        >
++          <div
++            className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${project.color} flex items-center justify-center text-white shrink-0 shadow-md group-hover:scale-110 transition-transform duration-300`}
++          >
++            <Smartphone size={24} />
++          </div>
++          <div className="flex-1 min-w-0">
++            <h4 className="text-lg font-bold text-slate-900 truncate mb-0.5">{project.title}</h4>
++            <div className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wide">
++              <span>{project.category}</span>
++              <span className="w-1 h-1 rounded-full bg-slate-300" />
++              <span>{project.year}</span>
+             </div>
+           </div>
++          <div className="w-10 h-10 rounded-full bg-white border border-slate-100 flex items-center justify-center text-slate-300 group-hover:text-indigo-600 group-hover:border-indigo-100 transition-colors">
++            <ChevronRight size={20} />
++          </div>
+         </LiquidCard>
+-      </div>
++      ))}
++      <LiquidCard className="flex items-center gap-5 opacity-60 grayscale hover:grayscale-0 hover:opacity-100 transition-all cursor-not-allowed" padding="p-5" transparent>
++        <div className="w-14 h-14 rounded-2xl bg-slate-200 flex items-center justify-center text-slate-400 shrink-0">
++          <Code2 size={24} />
++        </div>
++        <div className="flex-1 min-w-0">
++          <h4 className="text-lg font-bold text-slate-500 truncate mb-0.5">Old Prototype 2020</h4>
++          <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wide">
++            <span>Archived</span>
++            <span className="w-1 h-1 rounded-full bg-slate-300" />
++            <span>2020</span>
++          </div>
++        </div>
++      </LiquidCard>
++    </div>
++  </LiquidSheet>
++);
+ 
+-      {/* --- DOCK NAVIGATION --- */}
+-      <LiquidDock activeId={activeSection} onChange={scrollTo} tabs={dockTabs} />
++/* -------------------------------------------------------------------------- */
++/* APP                                                                        */
++/* -------------------------------------------------------------------------- */
+ 
+-      {/* --- PROJECT DETAIL SHEET --- */}
+-      <LiquidSheet
+-        isOpen={!!selectedProject}
+-        onClose={() => handleSelectProject(null)}
+-        title={selectedProject?.category || 'Project'}
+-        headerRight={<LiquidButton size="sm" variant="ghost" icon={Share} onClick={handleShare} />}
+-      >
+-        {selectedProject && (
+-          <div className="pb-10">
+-            <div
+-              className={`h-72 w-full bg-gradient-to-br ${selectedProject.color} rounded-[32px] mb-8 flex items-center justify-center shadow-lg relative overflow-hidden`}
+-            >
+-              <div
+-                className="absolute inset-0 opacity-20 mix-blend-overlay"
+-                style={{ backgroundImage: `url("${NOISE_TEXTURE}")` }}
+-              />
+-              <div className="w-full h-full flex items-center justify-center scale-90 opacity-90">
+-                <Smartphone size={100} className="text-white drop-shadow-2xl" />
+-              </div>
+-            </div>
++export default function App() {
++  const [activeSection, setActiveSection] = useState<SectionId>('hero');
++  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
++  const [showArchive, setShowArchive] = useState(false);
++  const [aboutTab, setAboutTab] = useState<'skills' | 'interests'>('skills');
+ 
+-            <div className="space-y-8">
+-              <div>
+-                <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-3 tracking-tight">
+-                  {selectedProject.title}
+-                </h2>
+-                <p className="text-2xl text-slate-500 font-medium leading-snug">{selectedProject.tagline}</p>
+-              </div>
++  const dockTabs = useMemo(() => DOCK_TABS, []);
++  const aboutOptions = useMemo(() => ABOUT_OPTIONS, []);
+ 
+-              <div className="flex flex-wrap gap-2">
+-                {selectedProject.techStack.map((tech) => (
+-                  <span
+-                    key={tech}
+-                    className="px-3.5 py-1.5 bg-slate-100 rounded-lg text-xs font-bold text-slate-600 border border-slate-200 uppercase tracking-wide"
+-                  >
+-                    {tech}
+-                  </span>
+-                ))}
+-              </div>
++  const scrollTo = useCallback((id: SectionId) => {
++    setActiveSection(id);
++    if (typeof document === 'undefined') return;
++    const el = document.getElementById(id);
++    if (el) {
++      el.scrollIntoView({ behavior: 'smooth' });
++    }
++  }, []);
+ 
+-              <LiquidCard padding="p-8" transparent className="bg-slate-50/80 border-slate-100">
+-                <div className="grid grid-cols-2 gap-8 mb-6 pb-6 border-b border-slate-200">
+-                  <div>
+-                    <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Year</div>
+-                    <div className="text-lg font-black text-slate-900">{selectedProject.year}</div>
+-                  </div>
+-                  <div>
+-                    <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Role</div>
+-                    <div className="text-lg font-black text-slate-900">{selectedProject.role}</div>
+-                  </div>
+-                </div>
+-                <p className="text-slate-700 leading-relaxed text-lg">{selectedProject.description}</p>
+-              </LiquidCard>
++  const handleSectionChange = useCallback((id: SectionId) => {
++    setActiveSection(id);
++  }, []);
+ 
+-              <div className="pt-4">
+-                <LiquidButton size="lg" className="w-full" onClick={handleOpenAppStore} icon={ExternalLink}>
+-                  View on App Store
+-                </LiquidButton>
+-              </div>
+-            </div>
+-          </div>
+-        )}
+-      </LiquidSheet>
++  useSectionObserver(handleSectionChange);
+ 
+-      {/* --- ARCHIVE SHEET --- */}
+-      <LiquidSheet isOpen={showArchive} onClose={handleCloseArchive} title="All Projects Archive">
+-        <div className="space-y-4 pt-2">
+-          {PROJECTS.map((project) => (
+-            <LiquidCard
+-              key={project.id}
+-              onClick={() => {
+-                handleSelectProject(project);
+-                handleCloseArchive();
+-              }}
+-              className="flex items-center gap-5 hover:bg-slate-50 transition-colors cursor-pointer group"
+-              padding="p-5"
+-              transparent
+-            >
+-              <div
+-                className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${project.color} flex items-center justify-center text-white shrink-0 shadow-md group-hover:scale-110 transition-transform duration-300`}
+-              >
+-                <Smartphone size={24} />
+-              </div>
+-              <div className="flex-1 min-w-0">
+-                <h4 className="text-lg font-bold text-slate-900 truncate mb-0.5">{project.title}</h4>
+-                <div className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wide">
+-                  <span>{project.category}</span>
+-                  <span className="w-1 h-1 rounded-full bg-slate-300" />
+-                  <span>{project.year}</span>
+-                </div>
+-              </div>
+-              <div className="w-10 h-10 rounded-full bg-white border border-slate-100 flex items-center justify-center text-slate-300 group-hover:text-indigo-600 group-hover:border-indigo-100 transition-colors">
+-                <ChevronRight size={20} />
+-              </div>
+-            </LiquidCard>
+-          ))}
+-          <LiquidCard className="flex items-center gap-5 opacity-60 grayscale hover:grayscale-0 hover:opacity-100 transition-all cursor-not-allowed" padding="p-5" transparent>
+-            <div className="w-14 h-14 rounded-2xl bg-slate-200 flex items-center justify-center text-slate-400 shrink-0">
+-              <Code2 size={24} />
+-            </div>
+-            <div className="flex-1 min-w-0">
+-              <h4 className="text-lg font-bold text-slate-500 truncate mb-0.5">Old Prototype 2020</h4>
+-              <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wide">
+-                <span>Archived</span>
+-                <span className="w-1 h-1 rounded-full bg-slate-300" />
+-                <span>2020</span>
+-              </div>
+-            </div>
+-          </LiquidCard>
+-        </div>
+-      </LiquidSheet>
++  const handleContact = useCallback(() => {
++    openMailLink(PROFILE.email);
++  }, []);
++
++  const handleShare = useCallback(() => {
++    shareContent(PROFILE.catchphrase);
++  }, []);
++
++  const handleOpenAppStore = useCallback(() => {
++    safeAlert(APP_STORE_MESSAGE);
++  }, []);
++
++  const handleSelectProject = useCallback((project: Project | null) => {
++    setSelectedProject(project);
++  }, []);
++
++  const handleOpenArchive = useCallback(() => setShowArchive(true), []);
++  const handleCloseArchive = useCallback(() => setShowArchive(false), []);
++
++  const handleArchiveSelect = useCallback(
++    (project: Project) => {
++      setSelectedProject(project);
++      setShowArchive(false);
++    },
++    []
++  );
++
++  return (
++    <LiquidContainer>
++      <HeroSection profile={PROFILE} onScrollToWork={() => scrollTo('work')} onContact={handleContact} />
++      <WorkSection projects={PROJECTS} onSelectProject={(project) => handleSelectProject(project)} onOpenArchive={handleOpenArchive} />
++      <TimelineSection
++        items={TIMELINE_DATA}
++        onSelectProject={(project) => {
++          handleSelectProject(project);
++        }}
++      />
++      <AboutSection
++        profile={PROFILE}
++        aboutTab={aboutTab}
++        options={aboutOptions}
++        onChangeTab={setAboutTab}
++        onContact={handleContact}
++      />
++
++      <LiquidDock activeId={activeSection} onChange={scrollTo} tabs={dockTabs} />
++
++      <ProjectDetailSheet
++        project={selectedProject}
++        onClose={() => handleSelectProject(null)}
++        onShare={handleShare}
++        onOpenAppStore={handleOpenAppStore}
++      />
++
++      <ArchiveSheet
++        projects={PROJECTS}
++        isOpen={showArchive}
++        onSelect={handleArchiveSelect}
++        onClose={handleCloseArchive}
++      />
+     </LiquidContainer>
+   );
+-}
+\ No newline at end of file
++}
+diff --git a/artifacts/_catalog.md b/artifacts/_catalog.md
+index bd79717..1d99fd2 100644
+--- a/artifacts/_catalog.md
++++ b/artifacts/_catalog.md
+@@ -1,4 +1,4 @@
+ # Catalog
+ 
+ - UI/Frontend
+-  - Workset `20251204__ui-hardening`: Portfolio React UI technical debt reduction (single-file constraint, maintain existing preview/UX). Status: Edits `20251204_150627__ui-refactor`, `20251204_211221__folder-interaction` completed.
++  - Workset `20251204__ui-hardening`: Portfolio React UI technical debt reduction (single-file constraint, maintain existing preview/UX). Status: Edits `20251204_150627__ui-refactor`, `20251204_211221__folder-interaction`, `20251204_214311__app-hardening` completed.
+diff --git a/artifacts/_index.json b/artifacts/_index.json
+index e7d9fd8..4f11be0 100644
+--- a/artifacts/_index.json
++++ b/artifacts/_index.json
+@@ -12,6 +12,10 @@
+         {
+           "id": "20251204_211221__folder-interaction",
+           "status": "completed"
++        },
++        {
++          "id": "20251204_214311__app-hardening",
++          "status": "completed"
+         }
+       ]
+     }
+diff --git a/artifacts/_timeline.md b/artifacts/_timeline.md
+index 96c2b9e..45a5b4d 100644
+--- a/artifacts/_timeline.md
++++ b/artifacts/_timeline.md
+@@ -3,3 +3,4 @@
+ - 2025-12-04: Workset `20251204__ui-hardening` created for portfolio UI hardening; Edit `20251204_150627__ui-refactor` planned (awaiting plan approval).
+ - 2025-12-04: Edit `20251204_150627__ui-refactor` completed — app.tsx refactored with typed data/constants and stable handlers; UI/preview preserved.
+ - 2025-12-04: Edit `20251204_211221__folder-interaction` completed — FolderInteraction mockup refactored with typed layouts, motion/config constants, and reusable skeleton blocks; UI/preview preserved.
++- 2025-12-04: Edit `20251204_214311__app-hardening` completed — app.tsx reorganized into section components with guarded helpers and centralized tokens while keeping existing UI and canvas preview.
+diff --git a/artifacts/file-map.md b/artifacts/file-map.md
+index 1874790..eba9d6b 100644
+--- a/artifacts/file-map.md
++++ b/artifacts/file-map.md
+@@ -39,3 +39,14 @@ artifacts/ — SSOT。全 Workset/編集履歴を格納。
+ - artifacts/worksets/20251204__ui-hardening/edits/20251204_211221__folder-interaction/meta/qa_checklist.md — チェックリスト。
+ - artifacts/worksets/20251204__ui-hardening/edits/20251204_211221__folder-interaction/attachments/ — スクリーンショット等の置き場（空）。
+ - artifacts/worksets/20251204__ui-hardening/edits/20251204_211221__folder-interaction/contracts/ — 契約変更がある場合の置き場（空）。
++- artifacts/worksets/20251204__ui-hardening/edits/20251204_214311__app-hardening/before/app.tsx — 変更前スナップショット（app.tsx）。
++- artifacts/worksets/20251204__ui-hardening/edits/20251204_214311__app-hardening/before/manifest_before.json — before スナップショットの SHA-256。
++- artifacts/worksets/20251204__ui-hardening/edits/20251204_214311__app-hardening/after/app.tsx — 変更後スナップショット（app.tsx）。
++- artifacts/worksets/20251204__ui-hardening/edits/20251204_214311__app-hardening/after/manifest_after.json — after スナップショットの SHA-256。
++- artifacts/worksets/20251204__ui-hardening/edits/20251204_214311__app-hardening/diff/git_unified.diff — 今回の差分。
++- artifacts/worksets/20251204__ui-hardening/edits/20251204_214311__app-hardening/meta/plan.md — 本 Edit の計画（承認済み）。
++- artifacts/worksets/20251204__ui-hardening/edits/20251204_214311__app-hardening/meta/evaluation.md — 評価・検証結果。
++- artifacts/worksets/20251204__ui-hardening/edits/20251204_214311__app-hardening/meta/outcome.json — 構造化アウトカム。
++- artifacts/worksets/20251204__ui-hardening/edits/20251204_214311__app-hardening/meta/qa_checklist.md — チェックリスト。
++- artifacts/worksets/20251204__ui-hardening/edits/20251204_214311__app-hardening/attachments/ — スクリーンショット等の置き場（空）。
++- artifacts/worksets/20251204__ui-hardening/edits/20251204_214311__app-hardening/contracts/ — 契約変更がある場合の置き場（空）。
+diff --git a/artifacts/worksets/20251204__ui-hardening/WORKSET.md b/artifacts/worksets/20251204__ui-hardening/WORKSET.md
+index ab1c246..51220e0 100644
+--- a/artifacts/worksets/20251204__ui-hardening/WORKSET.md
++++ b/artifacts/worksets/20251204__ui-hardening/WORKSET.md
+@@ -25,3 +25,4 @@
+ - 2025-12-04: Edit `20251204_150627__ui-refactor` — plan 作成中（承認待ち）。
+ - 2025-12-04: Edit `20251204_150627__ui-refactor` — app.tsx を型定義と定数集約で整理（UI/プレビュー維持）。
+ - 2025-12-04: Edit `20251204_211221__folder-interaction` — FolderInteraction モックを定数・型・再利用コンポーネントで整理し、UI/プレビューを維持したまま負債を削減。
++- 2025-12-04: Edit `20251204_214311__app-hardening` — app.tsx をセクション単位のコンポーネント化とヘルパー集約で安定化（UI/プレビュー維持）。
+diff --git a/artifacts/worksets/20251204__ui-hardening/_index.json b/artifacts/worksets/20251204__ui-hardening/_index.json
+index b49b6bf..d5a4cf0 100644
+--- a/artifacts/worksets/20251204__ui-hardening/_index.json
++++ b/artifacts/worksets/20251204__ui-hardening/_index.json
+@@ -15,6 +15,13 @@
+       "summary": "Refactored FolderInteraction mockup with typed layouts, motion/config constants, and reusable skeleton blocks while keeping UI/preview unchanged.",
+       "createdAt": "2025-12-04T21:12:21",
+       "completedAt": "2025-12-04T21:40:00"
++    },
++    {
++      "id": "20251204_214311__app-hardening",
++      "status": "completed",
++      "summary": "Reorganized app.tsx into section components with guarded helpers and centralized tokens while maintaining existing UI and canvas preview.",
++      "createdAt": "2025-12-04T21:43:11",
++      "completedAt": "2025-12-04T22:10:00"
+     }
+   ]
+ }
+diff --git a/artifacts/worksets/20251204__ui-hardening/_index.md b/artifacts/worksets/20251204__ui-hardening/_index.md
+index 82e037d..1ac1016 100644
+--- a/artifacts/worksets/20251204__ui-hardening/_index.md
++++ b/artifacts/worksets/20251204__ui-hardening/_index.md
+@@ -2,3 +2,4 @@
+ 
+ - 20251204_150627__ui-refactor — Status: Completed — Refactored the single-file React UI with typed data/constants and stable handlers while preserving preview and UX.
+ - 20251204_211221__folder-interaction — Status: Completed — Refactored FolderInteraction mockup with typed layouts, motion/config constants, and reusable skeleton blocks while keeping UI/preview unchanged.
++- 20251204_214311__app-hardening — Status: Completed — Reorganized app.tsx into section components with guarded helpers and centralized tokens while maintaining the existing UI and canvas preview.

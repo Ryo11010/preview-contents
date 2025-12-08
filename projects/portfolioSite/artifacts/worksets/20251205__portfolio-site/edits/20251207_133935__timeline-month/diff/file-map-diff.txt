@@ -1,0 +1,28 @@
+diff --git a/artifacts/file-map.md b/artifacts/file-map.md
+index c524b12..2ccab2b 100644
+--- a/artifacts/file-map.md
++++ b/artifacts/file-map.md
+@@ -294,6 +294,23 @@ artifacts/worksets/20251205__portfolio-site/ — 新規ポートフォリオ実
+ - artifacts/worksets/20251205__portfolio-site/edits/20251206_031043__work-section-english/meta/qa_checklist.md — QA チェックリスト。
+ - artifacts/worksets/20251205__portfolio-site/edits/20251206_031043__work-section-english/attachments/ — 添付（空）。
+ - artifacts/worksets/20251205__portfolio-site/edits/20251206_031043__work-section-english/contracts/ — 契約変更（空）。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/meta/plan.md — Journey タイムラインに年月表示を追加する計画（承認済）。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/before/Timeline.tsx — 変更前 Timeline セクション（年のみ表示）。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/before/timeline.ts — 変更前 タイムラインデータ（年のみ）。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/before/types.ts — 変更前 タイムライン型（月フィールドなし）。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/before/manifest_before.json — before SHA-256。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/after/Timeline.tsx — 変更後 Timeline セクション（年月フォーマット表示）。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/after/timeline.ts — 変更後 タイムラインデータ（月情報追加、YYYY.MM 表示用）。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/after/types.ts — 変更後 タイムライン型（月フィールド追加）。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/after/manifest_after.json — after SHA-256。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/diff/git_unified.diff — 差分（Timeline 表示とデータの月追加）。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/diff/lint_and_typecheck.log — `npm run lint` ログ。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/diff/tests.log — テスト実行状況（今回は未実施）。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/meta/evaluation.md — 評価。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/meta/outcome.json — 構造化アウトカム。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/meta/qa_checklist.md — QA チェックリスト。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/attachments/ — 添付（空）。
++- artifacts/worksets/20251205__portfolio-site/edits/20251207_133935__timeline-month/contracts/ — 契約変更（空）。
+ 
+ artifacts/success-cases/ — 成功事例置き場。
+ - artifacts/success-cases/20251205_192700__postcss-explicit-config/README.md — Tailwind 未展開を PostCSS 設定明示で解消した成功事例。

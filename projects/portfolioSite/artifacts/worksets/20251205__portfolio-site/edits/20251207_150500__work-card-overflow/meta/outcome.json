@@ -1,0 +1,17 @@
+{
+  "editId": "20251207_150500__work-card-overflow",
+  "worksetId": "20251205__portfolio-site",
+  "status": "partial",
+  "summary": "Kept edge-aware fan-out via anchor offsets to prevent edge clipping; reverted hover z-index/state changes due to instability while leaving tokens centralized.",
+  "testing": {
+    "lint": "pass",
+    "unit": "not_run",
+    "integration": "not_run",
+    "e2e": "not_run",
+    "notes": "Ran `npm run lint`; no other automated tests executed. Hover stacking deferred."
+  },
+  "hardcode": {
+    "policyFollowed": true,
+    "notes": "All layout constants reside in config/tokens.ts; no environment-dependent literals introduced."
+  }
+}

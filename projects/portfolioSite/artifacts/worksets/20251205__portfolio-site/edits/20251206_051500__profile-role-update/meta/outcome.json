@@ -1,0 +1,20 @@
+{
+  "editId": "20251206_051500__profile-role-update",
+  "worksetId": "20251205__portfolio-site",
+  "timestamp": "2025-12-06T05:15:00Z",
+  "status": "success",
+  "summary": "プロフィール肩書きを2行表示に更新",
+  "filesChanged": [
+    "site/src/data/types.ts",
+    "site/src/data/profile.ts",
+    "site/src/components/sections/About.tsx"
+  ],
+  "linesAdded": 10,
+  "linesRemoved": 3,
+  "testsPassed": true,
+  "typeCheckPassed": "pending",
+  "tags": ["ui", "profile", "content-update"],
+  "relatedEdits": [],
+  "risks": [],
+  "rollbackProcedure": "Restore files from before/ directory"
+}

@@ -1,0 +1,8 @@
+- [x] Workset 確認／Plan 承認（No-Plan, No-Code 遵守）
+- [x] ハードコード観点の整理（URL/コピー/閾値を config/data に集約）
+- [x] Next.js App Router プロジェクトを `site/` に新規作成（UI/データ分離）
+- [x] mockup UI の主要セクション・動きをコンポーネント化して移植
+- [ ] Lint/型/テスト実行 — `npm install` 後に実行予定
+- [x] file-map.md 更新・インデックス/タイムライン更新
+- [x] before/after/diff/meta のディレクトリ整備（スナップショットは未配置）
+- [x] ハードコード禁止の再確認（環境依存値のロジック直書きなし）
