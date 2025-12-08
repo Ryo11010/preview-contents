@@ -1,7 +1,0 @@
-- [x] Workset 確認／Plan 承認（No-Plan, No-Code 遵守）
-- [x] ハードコード観点整理（spread/edge/z-index は tokens.ts に集約）
-- [x] before/after/diff/meta の 3+1 整備
-- [x] file-map.md 更新反映
-- [x] タイムライン／カタログ／インデックス更新
-- [x] Lint/型チェック実行（`npm run lint`）
-- [ ] 追加のユニット/統合/E2E テスト（今回は未実施）

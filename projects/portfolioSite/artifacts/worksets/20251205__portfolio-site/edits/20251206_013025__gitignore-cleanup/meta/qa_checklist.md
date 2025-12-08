@@ -1,7 +1,0 @@
-- [x] Workset 確認／Plan 承認（No-Plan, No-Code 遵守）
-- [x] ハードコード観点整理（新規値なし、除外パターンのみ追加）
-- [x] `.gitignore` を拡充し、ビルド成果物・キャッシュ・ログ・OS/エディタ生成物を除外
-- [x] before/after/diff/meta の 3+1 整備
-- [x] file-map.md 更新反映
-- [x] タイムライン／カタログ／インデックス更新
-- [ ] Lint/型/テスト実行（未実施）

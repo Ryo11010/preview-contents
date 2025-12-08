@@ -1,6 +1,0 @@
-- [x] Workset 確認／Plan 承認（No-Plan, No-Code 遵守）
-- [x] ハードコード観点の整理（URL/メール/コピーを data/config に集約）
-- [x] before/after/diff/meta の 3+1 整備（manifest 含む）
-- [x] file-map.md 更新反映
-- [x] タイムライン／カタログ／インデックス更新
-- [ ] Lint/型/テスト実行（未実施）

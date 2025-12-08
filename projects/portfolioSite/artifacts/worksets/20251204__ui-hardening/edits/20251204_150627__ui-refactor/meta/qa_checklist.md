@@ -1,7 +1,0 @@
-- [x] Workset 確認／Plan 承認（No-Plan, No-Code遵守）
-- [x] ハードコード観点の列挙と切り出し方針を明記
-- [x] 最小パッチで app.tsx を整理（単一ファイル要件維持）
-- [ ] Lint/型/テスト実行（未実施） — 要フォロー
-- [x] file-map.md 更新
-- [x] before/after/diff/meta の 3+1 整備
-- [x] WORKSET タイムライン/インデックス更新

@@ -1,6 +1,0 @@
-- [x] Workset 確認／Plan 承認（No-Plan, No-Code 遵守）
-- [x] ハードコード観点整理（無視パターンのみ追加、環境値なし）
-- [x] `.gitignore` に `.next/` と `site/.next/` を明示し、`git rm --cached -r site/.next` で既存追跡を除外
-- [x] before/after/diff/meta の 3+1 整備
-- [x] file-map.md 更新／Workset index・カタログ・タイムライン・全体 index 反映
-- [ ] Lint/型/テスト実行（未実施：設定変更のみ）

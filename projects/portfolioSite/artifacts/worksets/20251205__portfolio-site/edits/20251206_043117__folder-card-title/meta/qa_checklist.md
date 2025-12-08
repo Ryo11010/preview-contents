@@ -1,6 +1,0 @@
-- [x] Workset 確認／Plan 承認（No-Plan, No-Code 遵守）
-- [x] ハードコード観点整理（レイアウト値のみ変更、環境依存値追加なし）
-- [x] before/after/diff/meta の 3+1 整備
-- [x] file-map.md 更新反映
-- [ ] タイムライン／カタログ／インデックス更新（未実施）
-- [ ] Lint/型/テスト実行（Next.js ESLint セットアップウィザードが表示されため未実施）

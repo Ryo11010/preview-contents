@@ -1,7 +1,0 @@
-- [x] Workset 確認／Plan 承認（No-Plan, No-Code 遵守）
-- [x] ハードコード観点の列挙と定数/ヘルパー集約方針を適用
-- [x] app.tsx を単一ファイルのままセクションコンポーネント化し可読性を向上（UI/挙動は不変）
-- [ ] Lint/型/テスト実行（未実施） — 要フォロー
-- [x] file-map.md 更新
-- [x] before/after/diff/meta の 3+1 整備
-- [x] WORKSET タイムライン/インデックス更新

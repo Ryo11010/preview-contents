@@ -1,8 +1,0 @@
-- [x] Workset 確認／Plan 承認（No-Plan, No-Code 遵守）
-- [x] ハードコード観点整理（コピー/閾値/メトリクスを config/tokens/copy に集約）
-- [x] UI 文言・背景/フォルダ/シート閾値のトークン化と責務分離を実施
-- [x] `next.config.mjs` のリモート画像許可を更新し、ギャラリーを `next/image` 化
-- [x] before/after/diff/meta の 3+1 整備
-- [x] file-map／Workset／Index／Timeline 更新
-- [x] `npm run lint` 実行（パス）
-- [ ] `npm run build` 実行（オフラインで Google Fonts 取得に失敗）

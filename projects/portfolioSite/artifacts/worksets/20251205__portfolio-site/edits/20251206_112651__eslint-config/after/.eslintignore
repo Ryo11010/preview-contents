@@ -1,7 +1,0 @@
-.next
-node_modules
-artifacts
-coverage
-dist
-out
-!.eslintrc.cjs

@@ -1,7 +1,0 @@
-- [x] Workset 確認／Plan 承認（No-Plan, No-Code 遵守）
-- [x] ハードコード観点整理（新規値なし、content パス明示のみ）
-- [x] Tailwind content を絶対パス化し、js/jsx/mdx を含めてスキャン漏れを防止
-- [x] before/after/diff/meta の 3+1 整備
-- [x] file-map.md 更新反映
-- [x] タイムライン／カタログ／インデックス更新
-- [ ] Lint/型/テスト実行（未実施）

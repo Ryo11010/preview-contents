@@ -1,6 +1,0 @@
-- [x] Workset 確認／Plan 承認
-- [x] ハードコード観点：文言は data/config に集約、直書きなし
-- [x] before/after/diff/meta の 3+1 整備
-- [x] file-map.md 更新
-- [x] タイムライン／カタログ／インデックス更新
-- [ ] Lint/型/テスト（未実施）

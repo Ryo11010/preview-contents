@@ -1,6 +1,0 @@
-- [x] Workset 確認／Plan 承認（No-Plan, No-Code 遵守）
-- [x] タイムライン月情報を型・データに追加し、フォーマットヘルパーで表示
-- [x] before/after/diff/meta の 3+1 整備
-- [x] file-map／Workset インデックス／全体 Timeline/Catalog/_index を更新
-- [x] `npm run lint` 実行（パス）
-- [ ] 追加のテスト（build/E2E）は未実施（必要に応じて実行）
