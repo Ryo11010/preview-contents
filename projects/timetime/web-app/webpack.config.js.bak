@@ -1,0 +1,89 @@
+const path = require('path');
+const fs = require('fs');
+const webpack = require('webpack');
+const createExpoWebpackConfigAsync = require('@expo/webpack-config');
+
+module.exports = async function (env, argv) {
+  const isProd = env.mode === 'production';
+  const config = await createExpoWebpackConfigAsync(env, argv);
+
+  const appRoot = __dirname;
+  const workspaceRoot = path.resolve(__dirname, '..');
+  const appSrcRoot = path.resolve(appRoot, 'src/app');
+
+  // Ensure TS/JS in the monorepo (app sources) are transpiled for web
+  config.module.rules.forEach((rule) => {
+    if (!rule.oneOf) return;
+    rule.oneOf.forEach((one) => {
+      const usesBabel =
+        one.use &&
+        ((Array.isArray(one.use) && one.use.some((u) => u.loader?.includes('babel-loader'))) ||
+          (one.use.loader && one.use.loader.includes('babel-loader')));
+      if (!usesBabel) return;
+      const includePaths = new Set();
+      if (typeof one.include === 'string') {
+        includePaths.add(path.resolve(one.include));
+      } else if (Array.isArray(one.include)) {
+        one.include.forEach((p) => {
+          if (typeof p === 'string') includePaths.add(path.resolve(p));
+        });
+      }
+      [appRoot, workspaceRoot, appSrcRoot].forEach((p) => includePaths.add(p));
+      one.include = Array.from(includePaths);
+    });
+  });
+
+  config.resolve.alias = {
+    ...(config.resolve.alias || {}),
+    'react-native$': 'react-native-web',
+  };
+
+  const modulePaths = new Set(config.resolve.modules || []);
+  [path.resolve(appRoot, 'node_modules'), path.resolve(workspaceRoot, 'node_modules')].forEach(
+    (p) => modulePaths.add(p),
+  );
+  config.resolve.modules = Array.from(modulePaths);
+
+  const loadEnv = (envPath) => {
+    if (!fs.existsSync(envPath)) return {};
+    const lines = fs.readFileSync(envPath, 'utf8').split(/\r?\n/);
+    return lines.reduce((acc, line) => {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) return acc;
+      const idx = trimmed.indexOf('=');
+      if (idx === -1) return acc;
+      const key = trimmed.slice(0, idx).trim();
+      const val = trimmed.slice(idx + 1).trim();
+      acc[key] = val;
+      return acc;
+    }, {});
+  };
+
+  const envFromFile = loadEnv(path.resolve(workspaceRoot, '.env'));
+  const debugOverlayEnabledRaw =
+    envFromFile.DEBUG_OVERLAY_ENABLED ?? process.env.DEBUG_OVERLAY_ENABLED ?? 'false';
+  const debugOverlayEnabledBool = String(debugOverlayEnabledRaw).toLowerCase() === 'true';
+
+  config.plugins = config.plugins || [];
+  config.plugins.push(
+    new webpack.DefinePlugin({
+      __DEBUG_OVERLAY_ENABLED__: JSON.stringify(debugOverlayEnabledBool),
+      'process.env.DEBUG_OVERLAY_ENABLED': JSON.stringify(debugOverlayEnabledBool),
+    }),
+  );
+
+  // Disable webpack persistent cache to avoid CRC issues in constrained environments
+  config.cache = false;
+
+  if (isProd) {
+    config.devtool = false;
+    config.optimization = {
+      ...(config.optimization || {}),
+      sideEffects: true,
+      usedExports: true,
+      concatenateModules: true,
+    };
+  }
+
+  return config;
+};

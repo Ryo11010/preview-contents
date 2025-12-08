@@ -22,3 +22,12 @@
 - 検証: `npm run build` (timetime) / `npm run export` (portfolioSite) を実行。`node scripts/generate-previews-json.mjs` で 2 件生成を確認。ブラウザ実行は未。
 - 影響: /projects 配下に timetime/stg と portfolioSite/preview を配置済み。previews.json が自動生成されるためドラッグ後にスクリプト実行で一覧に反映される。dotfiles への直接アクセスは禁止。
 - ロールバック: `/projects/timetime/stg` と `/projects/portfolioSite/preview` を削除し、previews.json を空配列に戻す。`projects/.htaccess` からブロックルールを除去し、Vite/Next 設定を元に戻す。
+
+### 2025-12-09 GID=20251209_053346__timetime_web_export Turn=T01
+- 目的: timetime RN/Expo の静的ビルドを最新化し、preview-contents.site の stg を更新する。
+- 参照: 成功 `S-001`（/projects/.htaccess による SPA フォールバック維持）を踏まえ、既存フォールバックを壊さないよう .htaccess を保持しつつ同期。失敗 `F-001`（資材欠損で 404/500）を避けるため rsync --delete とアセット経路のリライトで欠落/パスずれを防止。
+- 代替案: (A) Expo export を調整して再ビルドし stg に全置換（採用）、(B) 既存ビルドを部分上書きのみ、(C) 現状ビルドを流用して previews.json だけ更新。
+- 実施: `package.json` の export スクリプトを Metro 対応の `expo export --platform web --output-dir web-build` へ更新しビルド。出力後、Expo Router の linking prefix を `/projects/timetime/stg` へパッチし、root .htaccess に /_expo と /assets を stg 配下へリライトするルールを追加。favicon 参照を相対化。rsync --delete で web-build を stg に同期（.htaccess 除外）。previews.json の updatedAt を更新。
+- 検証: `npm run export:web:prod` を実行し正常終了（静的ルート 25 件出力、バンドル生成を確認）。追加テストは未実施。
+- 影響: timetime/stg が Expo Router の最新静的ビルドに置き換わり、ルートレベルからのアセット参照（/_expo, /assets）も stg 配下に正しくルーティングされる。previews 一覧の日付を更新。
+- ロールバック: root .htaccess のリライト2行を削除し、projects/timetime/stg を以前のビルドに戻す（必要なら Git から復元）。

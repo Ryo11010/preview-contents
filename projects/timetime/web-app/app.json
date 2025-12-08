@@ -2,20 +2,32 @@
   "expo": {
     "name": "timetime-mockup-preview",
     "slug": "timetime-mockup-preview",
+    "scheme": "timetime",
     "version": "1.0.0",
     "orientation": "portrait",
     "sdkVersion": "51.0.0",
-    "platforms": ["ios", "android", "web"],
-    "assetBundlePatterns": ["**/*"],
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "web": {
       "bundler": "metro",
       "output": "static",
       "favicon": "./assets/favicon.png",
       "build": {
         "babel": {
-          "include": ["src/app"]
+          "include": [
+            "src/app"
+          ]
         }
       }
-    }
+    },
+    "plugins": [
+      "expo-router"
+    ]
   }
 }

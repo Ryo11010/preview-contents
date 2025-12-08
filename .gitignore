@@ -23,7 +23,8 @@ tmp/
 # Workset は後続で有効化：scripts/update-gitignore.mjs --gid <GID>
 
 
+
 # Workset is unignored below
 !/artifacts/worksets/
-!/artifacts/worksets/20251208_182220__auto_preview/
-!/artifacts/worksets/20251208_182220__auto_preview/**
+!/artifacts/worksets/20251209_053346__timetime_web_export/
+!/artifacts/worksets/20251209_053346__timetime_web_export/**

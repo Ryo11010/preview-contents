@@ -13,14 +13,63 @@
 - index.html
 - maintenance.html
 - previews.json
-- projects/
-  - .htaccess
-  - timetime/
-    - stg/
-      - .htaccess
-      - index.html
-      - assets/
-        - index-BlHb8XY3.js
+  - projects/
+    - .htaccess
+    - timetime/
+      - stg/
+        - .htaccess
+        - +not-found.html
+        - _sitemap.html
+        - dateUtils.html
+        - debugOverlay.html
+        - designTokens.html
+        - favicon.ico
+        - index.html
+        - mobile.html
+        - punchMeta.html
+        - roles.html
+        - screens/
+          - admin.html
+          - history.html
+          - punch.html
+          - settings.html
+        - state/
+          - appContext.html
+        - styleConstants.html
+        - styles.html
+        - types.html
+        - hooks/
+          - useNow.html
+          - useScrollLock.html
+          - useTextFieldFocus.html
+        - components/
+          - login.html
+          - menuCommon.html
+          - navigation.html
+          - ui.html
+        - liquid-ui/
+          - liquid-ui_RN.html
+        - _expo/
+          - static/
+            - js/
+              - web/
+                - entry-af72bd1837e75b504bb38ae27de1c963.js
+        - assets/
+          - favicon.ico
+          - node_modules/
+            - @react-navigation/
+              - elements/
+                - lib/
+                  - module/
+                    - assets/
+                      - back-icon-mask.5223c8d9b0d08b82a5670fb5f71faf78.png
+                      - back-icon.35ba0eaec5a4f5ed12ca16fabeae451d.png
+            - expo-router/
+              - assets/
+                - error.563d5e3294b67811d0a1aede6f601e30.png
+                - file.b6c297a501e289394b0bc5dc69c265e6.png
+                - forward.9d9c5644f55c2f6e4b7f247c378b2fe9.png
+                - pkg.5974eb3e1c5314e8d5a822702d7d0740.png
   - portfolioSite/
     - preview/
       - index.html
@@ -98,7 +147,7 @@
 
 ## File Roles
 - .gitignore — ベースの除外設定と artifacts ポリシー、現在の GID を unignore。
-- .htaccess — ルートの HTTPS リダイレクトとエラーページ、ディレクトリリスト無効化。
+- .htaccess — ルートの HTTPS リダイレクトとエラーページ、ディレクトリリスト無効化。timetime web 用に /_expo および /assets を /projects/timetime/stg/ 配下へリライト。
 - AGENTS.md — エージェント運用契約。
 - docs/PreviewContentsSite_Requirements_v1.0.md — 要件定義書 v1.0。
 - docs/PreviewContentsSite_Usage.md — 利用ガイド（/projects ドラッグ運用の手順）。
@@ -109,8 +158,9 @@
 - previews.json — 一覧データ（初期は空配列）。
 - projects/.htaccess — /projects 配下の SPA フォールバック設定（1階層/2階層対応）＋ドットファイル遮断。
 - projects/timetime/stg/.htaccess — timetime プレビューの SPA フォールバック（base=/projects/timetime/stg/）。
-- projects/timetime/stg/index.html — timetime ビルド済み index。
-- projects/timetime/stg/assets/index-BlHb8XY3.js — timetime ビルド済みバンドル。
+- projects/timetime/stg/index.html — timetime Expo Router static export (web) のトップ HTML（他のルート HTML と同梱）。
+- projects/timetime/stg/_expo/static/js/web/entry-af72bd1837e75b504bb38ae27de1c963.js — timetime web のメインバンドル（静的書き出し、assets 配下の画像と併用）。
+- projects/timetime/stg/assets/node_modules/** — Expo Router/React Navigation のアイコン画像を含む web 資産群。
 - projects/portfolioSite/preview/index.html — portfolioSite ビルド済み index（basePath=/projects/portfolioSite/preview）。
 - projects/portfolioSite/preview/index.txt — Next export の補助ファイル。
 - projects/portfolioSite/preview/404.html — portfolioSite の静的 404。

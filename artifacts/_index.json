@@ -1,48 +1,23 @@
 [
   {
+    "ts": "2025-12-08T14:39:00Z",
     "gid": "20251208_142847__restore",
     "turn": "T01",
     "title": "復旧＋/projects 即プレビュー再構築",
-    "artifacts": [
-      ".htaccess",
-      "index.html",
-      "previews.json",
-      "errors/404.html",
-      "errors/500.html",
-      "maintenance.html",
-      "projects/.htaccess",
-      "docs/PreviewContentsSite_Usage.md",
-      "artifacts/changes.md",
-      "artifacts/file-map.md"
-    ],
-    "tags": ["restore", "htaccess", "infra"],
-    "date": "2025-12-08"
+    "status": "success"
   },
   {
+    "ts": "2025-12-08T18:22:20Z",
     "gid": "20251208_182220__auto_preview",
     "turn": "T01",
     "title": "projects 自動プレビュー化（timetime/portfolioSite）",
-    "artifacts": [
-      "previews.json",
-      "projects/.htaccess",
-      "projects/timetime/stg/.htaccess",
-      "projects/timetime/stg/index.html",
-      "projects/timetime/stg/assets/index-BlHb8XY3.js",
-      "projects/portfolioSite/preview/index.html",
-      "projects/portfolioSite/preview/index.txt",
-      "projects/portfolioSite/preview/404.html",
-      "projects/portfolioSite/preview/favicon.ico",
-      "projects/portfolioSite/preview/_next/static/**",
-      "projects/portfolioSite/preview/images/**",
-      "scripts/generate-previews-json.mjs",
-      "docs/PreviewContentsSite_Usage.md",
-      "artifacts/changes.md",
-      "artifacts/spec.md",
-      "artifacts/file-map.md",
-      "artifacts/_timeline.md",
-      "artifacts/_catalog.md"
-    ],
-    "tags": ["preview", "automation", "build", "htaccess"],
-    "date": "2025-12-08"
+    "status": "success"
+  },
+  {
+    "ts": "2025-12-08T20:46:20Z",
+    "gid": "20251209_053346__timetime_web_export",
+    "turn": "T01",
+    "title": "timetime web 静的ビルド更新（Expo export + ルートリライト）",
+    "status": "success"
   }
 ]
