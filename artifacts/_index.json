@@ -19,5 +19,33 @@
     "turn": "T01",
     "title": "timetime web 静的ビルド更新（Expo export + ルートリライト）",
     "status": "success"
+  },
+  {
+    "ts": "2025-12-08T21:10:00Z",
+    "gid": "20251209_053346__timetime_web_export",
+    "turn": "T02",
+    "title": "timetime web スクリプト/アセットの絶対パスを相対化",
+    "status": "success"
+  },
+  {
+    "ts": "2025-12-08T21:25:00Z",
+    "gid": "20251209_053346__timetime_web_export",
+    "turn": "T03",
+    "title": "timetime stg 末尾スラッシュリダイレクト追加",
+    "status": "success"
+  },
+  {
+    "ts": "2025-12-10T15:39:44Z",
+    "gid": "20251210_153533__timetime_dist_unify",
+    "turn": "T01",
+    "title": "timetime /stg 配信撤廃と TestFlight/EAS へ統一",
+    "status": "success"
+  },
+  {
+    "ts": "2025-12-10T16:05:06Z",
+    "gid": "20251210_160506__timetime_export_routerfix",
+    "turn": "T01",
+    "title": "timetime Expo Router ルート衝突解消（lib へ移動）",
+    "status": "success"
   }
 ]

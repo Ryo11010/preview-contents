@@ -12,7 +12,7 @@ import {
 import { Eye, EyeOff, Lock, Mail } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { AppButton, GlassCard } from './ui';
-import { styles } from '../styles';
+import { styles } from '../../lib/styles';
 import { LOGIN_COLORS, LOGIN_FONT_SIZES, LOGIN_SPACING } from '../styleConstants';
 import type { MockAuthUser } from '../../../data/mockData';
 import type { IconComponent, User } from '../types';

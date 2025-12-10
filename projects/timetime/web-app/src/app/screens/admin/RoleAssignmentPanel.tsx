@@ -36,7 +36,7 @@ import {
 } from '../../../../data/mockData';
 import type { User } from '../../types';
 import { isGroupLevelRole, isOrgLevelRole } from '../../roles';
-import { styles } from '../../styles';
+import { styles } from '../../../lib/styles';
 import { useTextFieldFocus } from '../../hooks/useTextFieldFocus';
 
 type RoleAssignmentPanelProps = {

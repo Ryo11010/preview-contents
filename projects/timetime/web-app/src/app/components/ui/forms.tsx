@@ -16,7 +16,7 @@ import { LiquidSegmentControl } from '../../liquid-ui';
 import { GlassCard } from './cards';
 import { COLORS, spacing } from '../../designTokens';
 import type { IconComponent, ViewMode } from '../../types';
-import { styles } from '../../styles';
+import { styles } from '../../../lib/styles';
 import { useTextFieldFocus } from '../../hooks/useTextFieldFocus';
 
 type SegmentOption = string | { value: string; label: string };

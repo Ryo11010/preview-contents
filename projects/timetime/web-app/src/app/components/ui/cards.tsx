@@ -1,7 +1,7 @@
 import React from 'react';
 import { LayoutChangeEvent, View, Text } from 'react-native';
 import { COLORS, spacing } from '../../designTokens';
-import { styles } from '../../styles';
+import { styles } from '../../../lib/styles';
 import { LiquidCard } from '../../liquid-ui';
 
 type GlassCardProps = {
@@ -124,4 +124,3 @@ export const StatCard: React.FC<StatCardProps> = ({
     {children}
   </CardSurface>
 );
-

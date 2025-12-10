@@ -1,8 +1,0 @@
-{
-  "display": "standalone",
-  "lang": "en",
-  "name": "timetime-mockup-preview",
-  "short_name": "timetime-mockup-preview",
-  "start_url": "/?utm_source=web_app_manifest",
-  "orientation": "portrait"
-}

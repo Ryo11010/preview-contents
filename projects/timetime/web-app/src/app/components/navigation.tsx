@@ -44,7 +44,7 @@ import {
   spacing,
 } from '../designTokens';
 import type { TabKey, User } from '../types';
-import { styles } from '../styles';
+import { styles } from '../../lib/styles';
 import { isAdminRole } from '../roles';
 import { MOCK_GROUPS, MOCK_SUBGROUPS } from '../../../data/mockData';
 import {

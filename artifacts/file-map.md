@@ -13,63 +13,111 @@
 - index.html
 - maintenance.html
 - previews.json
-  - projects/
-    - .htaccess
-    - timetime/
-      - stg/
-        - .htaccess
-        - +not-found.html
-        - _sitemap.html
-        - dateUtils.html
-        - debugOverlay.html
-        - designTokens.html
-        - favicon.ico
-        - index.html
-        - mobile.html
-        - punchMeta.html
-        - roles.html
-        - screens/
-          - admin.html
-          - history.html
-          - punch.html
-          - settings.html
-        - state/
-          - appContext.html
-        - styleConstants.html
-        - styles.html
-        - types.html
-        - hooks/
-          - useNow.html
-          - useScrollLock.html
-          - useTextFieldFocus.html
-        - components/
-          - login.html
-          - menuCommon.html
-          - navigation.html
-          - ui.html
-        - liquid-ui/
-          - liquid-ui_RN.html
-        - _expo/
-          - static/
-            - js/
-              - web/
-                - entry-af72bd1837e75b504bb38ae27de1c963.js
-        - assets/
-          - favicon.ico
-          - node_modules/
-            - @react-navigation/
-              - elements/
-                - lib/
-                  - module/
-                    - assets/
-                      - back-icon-mask.5223c8d9b0d08b82a5670fb5f71faf78.png
-                      - back-icon.35ba0eaec5a4f5ed12ca16fabeae451d.png
-            - expo-router/
-              - assets/
-                - error.563d5e3294b67811d0a1aede6f601e30.png
-                - file.b6c297a501e289394b0bc5dc69c265e6.png
-                - forward.9d9c5644f55c2f6e4b7f247c378b2fe9.png
-                - pkg.5974eb3e1c5314e8d5a822702d7d0740.png
+- projects/
+  - .htaccess
+  - timetime/
+    - scripts/
+      - append-history.mjs
+      - bootstrap.mjs
+      - check-history-append-only.mjs
+      - derive-index.mjs
+      - migrate-append-only-history.mjs
+      - update-gitignore.mjs
+    - web-app/
+      - .DS_Store
+      - App.tsx
+      - app.json
+      - babel.config.js
+      - metro.config.js
+      - package-lock.json
+      - package.json
+      - package.json.bak
+      - tsconfig.json
+      - webpack.config.js.bak
+      - .expo/
+        - README.md
+        - devices.json
+        - web/
+          - cache/
+            - production/
+              - images/
+                - favicon/
+                  - favicon-80d26a12dafc30c62e4e55b05c129160c1d438d7a5089cdb71a4e307720b31b8-contain-transparent/
+                    - favicon-48.png
+      - assets/
+        - favicon.png
+      - data/
+        - mockData.ts
+      - src/
+        - .DS_Store
+        - app/
+          - .DS_Store
+          - _layout.tsx
+          - index.tsx
+          - components/
+            - login.tsx
+            - menuCommon.tsx
+            - navigation.tsx
+            - ui.tsx
+            - ui/buttons.tsx
+            - ui/cards.tsx
+            - ui/forms.tsx
+            - ui/layout.tsx
+            - ui/timeline.tsx
+          - hooks/
+            - useNow.ts
+            - useScrollLock.ts
+            - useTextFieldFocus.ts
+          - liquid-ui/
+            - button.tsx
+            - card.tsx
+            - container.tsx
+            - deleteConfirmationModal.tsx
+            - dock.tsx
+            - index.ts
+            - input.tsx
+            - liquid-ui_RN.tsx
+            - segmentControl.tsx
+            - sheet.tsx
+            - switch.tsx
+            - theme.ts
+          - state/
+            - appContext.tsx
+          - screens/
+            - admin/
+              - DashboardScreen.tsx
+              - GroupSettingsScreen.tsx
+              - OrgSettingsScreen.tsx
+              - RoleAssignmentPanel.tsx
+              - SettingsSections.tsx
+              - SubgroupSettingsScreen.tsx
+            - history.tsx
+            - punch.tsx
+            - settings.tsx
+          - debugOverlay.tsx
+          - designTokens.ts
+          - mobile.tsx
+          - punchMeta.ts
+          - roles.ts
+          - styleConstants.ts
+          - types.ts
+        - lib/
+          - styles/
+            - admin.ts
+            - controls.ts
+            - history.ts
+            - index.ts
+            - layout.ts
+            - login.ts
+            - menu.ts
+            - navigation.ts
+            - punch.ts
+            - settings.ts
+            - shared.ts
+          - styles.ts
+          - dateUtils.ts
+      - node_modules/
+        - ** (依存ライブラリ一式)
   - portfolioSite/
     - preview/
       - index.html
@@ -129,7 +177,7 @@
   - templates/
     - DebugOverlayTemplate.v1.js
   - worksets/
-    - 20251207_190740__bootstrap/...
+    - 20251207_190740__bootstrap/
     - 20251208_142847__restore/
       - before/ (empty)
       - after/ (empty)
@@ -147,7 +195,7 @@
 
 ## File Roles
 - .gitignore — ベースの除外設定と artifacts ポリシー、現在の GID を unignore。
-- .htaccess — ルートの HTTPS リダイレクトとエラーページ、ディレクトリリスト無効化。timetime web 用に /_expo および /assets を /projects/timetime/stg/ 配下へリライト。
+- .htaccess — ルートの HTTPS リダイレクトとエラーページ、ディレクトリリスト無効化（timetime 用リライトは撤廃）。
 - AGENTS.md — エージェント運用契約。
 - docs/PreviewContentsSite_Requirements_v1.0.md — 要件定義書 v1.0。
 - docs/PreviewContentsSite_Usage.md — 利用ガイド（/projects ドラッグ運用の手順）。
@@ -155,12 +203,13 @@
 - errors/500.html — 500 カスタムページ。
 - index.html — プレビュー一覧（previews.json を読み込む）。
 - maintenance.html — メンテナンス表示ページ。
-- previews.json — 一覧データ（初期は空配列）。
+- previews.json — 一覧データ（portfolioSite のみ掲載。timetime は /stg 配信を廃止）。
 - projects/.htaccess — /projects 配下の SPA フォールバック設定（1階層/2階層対応）＋ドットファイル遮断。
-- projects/timetime/stg/.htaccess — timetime プレビューの SPA フォールバック（base=/projects/timetime/stg/）。
-- projects/timetime/stg/index.html — timetime Expo Router static export (web) のトップ HTML（他のルート HTML と同梱）。
-- projects/timetime/stg/_expo/static/js/web/entry-af72bd1837e75b504bb38ae27de1c963.js — timetime web のメインバンドル（静的書き出し、assets 配下の画像と併用）。
-- projects/timetime/stg/assets/node_modules/** — Expo Router/React Navigation のアイコン画像を含む web 資産群。
+- projects/timetime/scripts/*.mjs — timetime 用の管理スクリプト群（bootstrap/履歴マージ/append-only チェック等）。
+- projects/timetime/web-app/app.json ほか設定群 — timetime RN/Expo アプリ設定・ビルド/型設定ファイル。
+- projects/timetime/web-app/src/app/** — timetime RN/Expo の画面/状態/コンポーネント実装（ルート公開用）。Web 配信は Expo Web export + EAS Hosting/Vercel 等を利用し、/projects/timetime/stg は使用しない。
+- projects/timetime/web-app/src/lib/** — timetime RN/Expo の共通ユーティリティ/スタイル群（Router 管理外）。styles/dateUtils などを集約。
+- projects/timetime/web-app/node_modules/** — timetime web-app の依存ライブラリ群。
 - projects/portfolioSite/preview/index.html — portfolioSite ビルド済み index（basePath=/projects/portfolioSite/preview）。
 - projects/portfolioSite/preview/index.txt — Next export の補助ファイル。
 - projects/portfolioSite/preview/404.html — portfolioSite の静的 404。
@@ -177,7 +226,7 @@
 - artifacts/_catalog.md — 機能/領域別インデックス。
 - artifacts/_index.json — 機械可読インデックス。
 - artifacts/templates/DebugOverlayTemplate.v1.js — デバッグオーバーレイの占位。
-- artifacts/worksets/20251207_190740__bootstrap/... — 旧ワークセット（内容保持）。
+- artifacts/worksets/20251207_190740__bootstrap/ — 旧ワークセット（内容保持）。
 - artifacts/worksets/20251208_142847__restore/meta/* — 本復旧ワークセットのメタ情報。
 
 ## Excluded

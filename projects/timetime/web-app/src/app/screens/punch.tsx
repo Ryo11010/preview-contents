@@ -13,7 +13,7 @@ import {
 } from '../punchMeta';
 import { useNow } from '../hooks/useNow';
 import type { PunchStatus, PunchTypeId, User } from '../types';
-import { styles } from '../styles';
+import { styles } from '../../lib/styles';
 
 type PunchScreenProps = { user: User };
 

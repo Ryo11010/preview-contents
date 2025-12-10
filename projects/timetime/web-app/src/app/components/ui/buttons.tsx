@@ -3,7 +3,7 @@ import { Text, View } from 'react-native';
 import type { IconComponent } from '../../types';
 import { LiquidButton, LiquidSwitch } from '../../liquid-ui';
 import { COLORS } from '../../designTokens';
-import { styles } from '../../styles';
+import { styles } from '../../../lib/styles';
 
 type ButtonVariant = 'primary' | 'danger' | 'ghost' | 'glass';
 type ButtonSize = 'md' | 'sm' | 'icon';
@@ -69,4 +69,3 @@ export const RoleChip: React.FC<{ role: string }> = ({ role }) => (
     <Text style={styles.roleChipText}>{role}</Text>
   </View>
 );
-

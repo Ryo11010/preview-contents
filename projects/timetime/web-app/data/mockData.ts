@@ -8,7 +8,7 @@ import {
   Subgroup,
   WeeklyStat,
 } from '../src/app/types';
-import { getWeekRange } from '../src/app/dateUtils';
+import { getWeekRange } from '../src/lib/dateUtils';
 
 export type MockAuthUser = User & { loginId: string; password: string };
 

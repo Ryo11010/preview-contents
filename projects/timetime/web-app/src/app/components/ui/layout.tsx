@@ -3,7 +3,7 @@ import { Text, View } from 'react-native';
 import { ChevronLeft, ChevronRight } from 'lucide-react-native';
 import { AppButton } from './buttons';
 import { COLORS, spacing } from '../../designTokens';
-import { styles } from '../../styles';
+import { styles } from '../../../lib/styles';
 
 type DateNavigatorProps = {
   label: string;
@@ -64,4 +64,3 @@ export const SettingsHeader: React.FC<SettingsHeaderProps> = ({
     {action}
   </View>
 );
-

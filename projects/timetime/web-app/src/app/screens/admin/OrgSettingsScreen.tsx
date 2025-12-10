@@ -2,7 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { AppButton, SettingsHeader } from '../../components/ui';
 import { APP_CONFIG } from '../../designTokens';
-import { styles } from '../../styles';
+import { styles } from '../../../lib/styles';
 import type { User } from '../../types';
 import { RoleAssignmentPanel } from './RoleAssignmentPanel';
 import { CommonSettingsForm, GeofenceSection, PunchSettingsSection } from './SettingsSections';
@@ -47,4 +47,3 @@ export const AdminOrgSettingsScreen: React.FC<AdminOrgSettingsScreenProps> = ({
     </View>
   );
 };
-

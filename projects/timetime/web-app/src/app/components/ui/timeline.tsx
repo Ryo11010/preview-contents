@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, View } from 'react-native';
 import { PUNCH_TYPE_META } from '../../punchMeta';
 import type { HistoryEvent } from '../../types';
-import { styles } from '../../styles';
+import { styles } from '../../../lib/styles';
 
 type TimelineItemProps = { event: HistoryEvent; isLast: boolean };
 
@@ -32,4 +32,3 @@ export const TimelineItem: React.FC<TimelineItemProps> = ({ event, isLast }) => 
     </View>
   );
 };
-

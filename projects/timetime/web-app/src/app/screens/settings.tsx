@@ -14,7 +14,7 @@ import {
 import { AppButton, CardSurface, TextField, SettingsHeader } from '../components/ui';
 import { APP_COPY, COLORS, spacing } from '../designTokens';
 import type { TabKey, User } from '../types';
-import { styles } from '../styles';
+import { styles } from '../../lib/styles';
 import { DebugOverlay, debugOverlayEnabled } from '../debugOverlay';
 
 type SettingsScreenProps = {

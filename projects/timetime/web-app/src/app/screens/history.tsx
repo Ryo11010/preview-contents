@@ -22,7 +22,7 @@ import {
   getShortDate,
   getWeekDate,
   shiftDateByViewMode,
-} from '../dateUtils';
+} from '../../lib/dateUtils';
 import {
   getDefaultSubgroupName,
   getHistoryEvents,
@@ -40,7 +40,7 @@ import {
 } from '../designTokens';
 import type { SelectOption } from '../components/ui';
 import type { User, ViewMode } from '../types';
-import { styles } from '../styles';
+import { styles } from '../../lib/styles';
 
 type HistoryScreenProps = {
   isModal?: boolean;

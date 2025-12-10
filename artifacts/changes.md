@@ -31,3 +31,38 @@
 - 検証: `npm run export:web:prod` を実行し正常終了（静的ルート 25 件出力、バンドル生成を確認）。追加テストは未実施。
 - 影響: timetime/stg が Expo Router の最新静的ビルドに置き換わり、ルートレベルからのアセット参照（/_expo, /assets）も stg 配下に正しくルーティングされる。previews 一覧の日付を更新。
 - ロールバック: root .htaccess のリライト2行を削除し、projects/timetime/stg を以前のビルドに戻す（必要なら Git から復元）。
+
+### 2025-12-09 GID=20251209_053346__timetime_web_export Turn=T02
+- 目的: サーバー側で /_expo や /assets への絶対パス参照が 404 になる問題を解消し、静的ビルドを base 配下で確実に読めるようにする。
+- 参照: 成功 `S-001`（htaccess でのルーティング維持）を踏まえ、フォールバックを壊さずにパスのみ修正。失敗 `F-001`（資材欠損）を避けるため、既存生成物を直接相対化するのみとした。
+- 代替案: (A) HTML/バンドルの絶対パスを相対に書き換える（採用）、(B) htaccess 側のリライト強化のみ、(C) Expo 再ビルド時に publicPath を再調整。
+- 実施: stg 配下の全 HTML で `src=\"/_expo/` を `src=\"_expo/` に、`href=\"/` を `href=\"` に置換し、`_sitemap` など内部リンクも base 配下に解決するよう相対化。エントリバンドル内の `httpServerLocation` 文字列を `/assets/...` から `assets/...` に書き換え、アセット参照が stg 配下に固定されるよう補正。
+- 検証: 置換後のファイルを目視確認（HTML 参照が相対化され、バンドルの httpServerLocation が assets/ になっていること）。追加の再ビルド・ブラウザ確認は未実施。
+- 影響: プレビューサーバーでベースパス配下にデプロイしても、/_expo や assets へのリクエストが stg 配下に解決され、404 を避けられる見込み。Chrome 拡張由来のログエラーとは切り分け可能。
+- ロールバック: stg 配下の HTML/JS を以前の絶対パス版で上書きすれば戻る（前回ビルドが必要）。必要に応じて root .htaccess のリライトで補完。
+### 2025-12-09 GID=20251209_053346__timetime_web_export Turn=T03
+- 目的: trailing slash なしアクセスで相対パスが 1 階層上に解決され JS が 404 となるのを防ぐ。
+- 参照: 成功 `S-001`（htaccess フォールバック維持）を踏まえ、ルートレベルのリライトを使って動的動作を壊さない方法を採用。失敗 `F-001` を避けるため変更は stg/.htaccess のみ。
+- 代替案: (A) stg/.htaccess で末尾スラッシュにリダイレクト（採用）、(B) HTML をルート参照に戻す、(C) ビルドを再生成して絶対パス参照に戻す。
+- 実施: `projects/timetime/stg/.htaccess` に `/projects/timetime/stg` へのアクセスを `/projects/timetime/stg/` へ 301 リダイレクトするルールを追加し、相対パスの解決先を stg 配下に固定。
+- 検証: ルールのみ追加のためサーバー反映後に `/projects/timetime/stg` へアクセスして `/projects/timetime/stg/` へリダイレクトされることを確認予定（ローカルでは未検証）。
+- 影響: 末尾スラッシュ無しアクセス時でも `_expo`/`assets` が stg 配下を指し、JS 404 による Unmatched Route 表示を防ぐ。
+- ロールバック: 追加したリダイレクト行を削除すれば元に戻る。
+
+### 2025-12-10 GID=20251210_153533__timetime_dist_unify Turn=T01
+- 目的: timetime RN の配信を /stg 静的配信から撤廃し、TestFlight/EAS Hosting/Vercel 等のホスト名ベースに統一する。
+- 参照: 成功 `S-001`（SPA フォールバック維持が必須）を踏まえ、他プロジェクトのフォールバックは残す設計に。失敗 `F-001`（資材欠損による 404/500）を防ぐため削除範囲を timetime の stg 配下と関連リライトに限定し、previews.json との整合を確認。
+- 代替案: (A) /stg 全撤廃（採用）、(B) ドキュメントのみで資材は残置、(C) timetime を一時的に非公開化して段階移行。
+- 実施: ルート `.htaccess` から timetime 向けリライト（/_expo, /assets → /projects/timetime/stg）を削除し、`projects/timetime/stg/` を丸ごと削除。`previews.json` から timetime を除外し、`artifacts/file-map.md` を timetime/scripts + web-app 構成に差し替え。`artifacts/spec.md` に配信方針（TestFlight: `npx testflight` or `eas build`+`eas submit`、Web: Expo Web export → EAS Hosting/Vercel）と /stg 禁止を追記。
+- 検証: 静的ファイルとメタのみの編集のためビルド/テストは未実施。
+- 影響: timetime の Web プレビューは preview-contents 配下から削除され、iOS TestFlight/EAS Hosting 等に一本化。portfolioSite など他プロジェクトのプレビューは維持。
+- ロールバック: stg 配下の静的成果物と `.htaccess` リライトを復元し、previews.json に timetime を再登録する。
+
+### 2025-12-10 GID=20251210_160506__timetime_export_routerfix Turn=T01
+- 目的: Expo Router のルート重複エラー（styles/dateUtils がルート扱い）を解消し、Web export を通す。
+- 参照: 成功 `S-001`（構成変更時もフォールバック/資材整合が重要）を踏まえ、共有モジュールのみ移動してルート構成を維持。失敗 `F-001` を避けるため静的成果物再生成後もツリー/メタを更新。
+- 代替案: (A) 共有モジュールを src/lib へ移動（採用）、(B) `_` プレフィックスで除外のみ、(C) app 配下全面再編。
+- 実施: `src/app/styles.ts` と `src/app/styles/`、`src/app/dateUtils.ts` を `src/lib/` に移動し、全インポートを新パスに更新。lib 側から参照する designTokens/styleConstants/liquid-ui も app 配下への相対パスに修正。mockData の dateUtils 参照を lib に更新。`artifacts/file-map.md` をツリー/役割の新配置に更新。`npm run export:web:prod` が成功し web-build を生成。
+- 検証: `npm run export:web:prod`（expo export --platform web）を実行し成功（45 ルート出力）。追加テストなし。
+- 影響: Expo Router のルート衝突が解消され、Web export が通る。今後の本番/プレビュー配信で stg 配信なしに静的ビルドを利用可能。
+- ロールバック: 移動したファイルを元の src/app 配下に戻し、インポートを旧パスへ戻す。

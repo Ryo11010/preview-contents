@@ -6,7 +6,7 @@ import { AppButton, AppSwitch, SearchBar, SectionCard, SelectField, TextField } 
 import { APP_CONFIG, COLORS, spacing } from '../../designTokens';
 import type { PunchSettingItem } from '../../types';
 import { INITIAL_PUNCH_ITEMS } from '../../../../data/mockData';
-import { styles } from '../../styles';
+import { styles } from '../../../lib/styles';
 import { useTextFieldFocus } from '../../hooks/useTextFieldFocus';
 
 const SimpleFocusedInput: React.FC<TextInputProps> = ({

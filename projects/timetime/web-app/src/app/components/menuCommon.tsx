@@ -3,7 +3,7 @@ import { Animated, LayoutChangeEvent, Pressable, Text, View } from 'react-native
 import { LinearGradient } from 'expo-linear-gradient';
 import { Check, ChevronDown } from 'lucide-react-native';
 import { COLORS } from '../designTokens';
-import { styles } from '../styles';
+import { styles } from '../../lib/styles';
 
 type MenuSurfaceProps = {
   gradient: string[];

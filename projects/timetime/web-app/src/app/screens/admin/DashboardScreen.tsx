@@ -3,9 +3,9 @@ import { FlatList, Text, View } from 'react-native';
 import { MapPin } from 'lucide-react-native';
 import { CardSurface, DateNavigator, SegmentControl, StatCard } from '../../components/ui';
 import { COLORS, VIEW_MODE_OPTIONS, layout, spacing } from '../../designTokens';
-import { formatDate, shiftDateByViewMode } from '../../dateUtils';
+import { formatDate, shiftDateByViewMode } from '../../../lib/dateUtils';
 import type { User, ViewMode } from '../../types';
-import { styles } from '../../styles';
+import { styles } from '../../../lib/styles';
 
 type AdminDashboardScreenProps = {
   onMemberClick: (id: string) => void;

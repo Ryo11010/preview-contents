@@ -21,7 +21,7 @@ import { useAppContext, AppProvider } from './state/appContext';
 import { getDefaultSubgroupName, MOCK_AUTH_USERS } from '../../data/mockData';
 import { isAdminRole } from './roles';
 import { useScrollLock } from './hooks/useScrollLock';
-import { styles } from './styles';
+import { styles } from '../lib/styles';
 import { COLORS, layout, spacing } from './designTokens';
 import type { TabKey } from './types';
 import { Menu } from 'lucide-react-native';

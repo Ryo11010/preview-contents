@@ -5,7 +5,7 @@ import { AppButton, CardSurface, SearchBar, SectionCard, SettingsHeader } from '
 import { COLORS, spacing } from '../../designTokens';
 import { MOCK_SUBGROUPS } from '../../../../data/mockData';
 import type { TabKey } from '../../types';
-import { styles } from '../../styles';
+import { styles } from '../../../lib/styles';
 
 type AdminSubgroupSettingsScreenProps = {
   onNavigate: (t: TabKey) => void;
