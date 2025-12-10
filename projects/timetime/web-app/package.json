@@ -6,8 +6,8 @@
   "scripts": {
     "start": "expo start",
     "web": "expo start --web",
-    "export:web": "expo export --platform web --output-dir web-build",
-    "export:web:prod": "NODE_ENV=production EXPO_WEB_ENV=production expo export --platform web --output-dir web-build"
+    "export:web": "expo export:web",
+    "export:web:prod": "NODE_ENV=production EXPO_WEB_ENV=production expo export:web"
   },
   "dependencies": {
     "@expo/metro-runtime": "~3.2.3",

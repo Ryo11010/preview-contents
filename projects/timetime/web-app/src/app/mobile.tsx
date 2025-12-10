@@ -22,12 +22,12 @@ import { getDefaultSubgroupName, MOCK_AUTH_USERS } from '../../data/mockData';
 import { isAdminRole } from './roles';
 import { useScrollLock } from './hooks/useScrollLock';
 import { styles } from './styles';
-import { COLORS } from './designTokens';
+import { COLORS, layout, spacing } from './designTokens';
 import type { TabKey } from './types';
 import { Menu } from 'lucide-react-native';
 
 const TAB_SCROLL_MODE: Record<TabKey, 'lock' | 'auto' | 'scroll'> = {
-  punch: 'auto',
+  punch: 'scroll',
   admin: 'lock',
   history: 'auto',
   settings: 'scroll',
@@ -55,7 +55,6 @@ const AppShell = () => {
     addMember,
   } = useAppContext();
   const { activeTab, menuVisible, sheetUserId, user, roleAssignments } = state;
-
   const scrollMode = TAB_SCROLL_MODE[activeTab] ?? 'scroll';
   const useOuterScroll = scrollMode === 'scroll';
   const isPunchTab = activeTab === 'punch';
@@ -240,7 +239,9 @@ const AppShell = () => {
           {!useOuterScroll ? (
             <View
               style={[
-                styles.scrollContent,
+                isAdminTab
+                  ? styles.adminStaticLock
+                  : styles.scrollContent,
                 styles.staticContent,
                 isPunchTab ? styles.punchContent : null,
                 isAdminTab ? styles.adminContent : null,
@@ -251,11 +252,16 @@ const AppShell = () => {
           ) : (
             <ScrollView
               style={styles.scrollView}
-              contentContainerStyle={styles.scrollContent}
+              contentContainerStyle={[
+                styles.scrollContent,
+                isPunchTab && styles.punchScrollContent,
+                { paddingBottom: layout.dockHeight + spacing.md },
+              ]}
               showsVerticalScrollIndicator={false}
               scrollEnabled
-              bounces={false}
+              alwaysBounceVertical
               overScrollMode="never"
+              contentInsetAdjustmentBehavior="always"
             >
               {renderScreen()}
             </ScrollView>

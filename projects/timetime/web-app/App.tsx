@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { SafeAreaView, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import MobileApp from './src/app/mobile';
 import DebugOverlayHost, {
   DebugOverlay,
@@ -14,19 +15,17 @@ export default function App() {
   }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <MobileApp />
-      <DebugOverlayHost />
-    </SafeAreaView>
+    <SafeAreaProvider>
+      <View style={styles.container}>
+        <MobileApp />
+        <DebugOverlayHost />
+      </View>
+    </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    minHeight: 0,
-    height: '100%',
-    width: '100%',
-    overflow: 'hidden',
   },
 });

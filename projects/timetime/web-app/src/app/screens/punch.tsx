@@ -173,7 +173,7 @@ export const PunchScreen: React.FC<PunchScreenProps> = ({ user }) => {
               ? '勤務中'
               : status === 'break'
               ? '休憩中'
-              : '退勤済'}
+            : '退勤済'}
           </Text>
         </CardSurface>
       </View>
